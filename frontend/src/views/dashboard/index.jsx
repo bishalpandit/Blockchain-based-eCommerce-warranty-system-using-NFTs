@@ -31,14 +31,14 @@ function index() {
       const signer = provider.getSigner()
       
       const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, signer); // setup contract 
-      const tokenContract = new ethers.Contract(nftAddress, NFT.abi,  provider); // setup contract 
+      const tokenContract = new ethers.Contract(nftAddress, NFT.abi,  signer); // setup contract 
     
       // get tokenURI by intracting with tokenContract 
       const data = await marketContract.fetchMyNFTs();
-
+      console.log("all data ", data)
       const items = await Promise.all(data.map(async i => { // map over all the items 
-
           const tokenUri = await tokenContract.tokenURI(i.tokenId)  // from tokenContract get tokenUri 
+          console.log("token uri ", tokenUri)
           const meta = await axios.get(tokenUri) //https://ipfs-url , get meta data from ipfs 
           let price = ethers.utils.formatUnits(i.price.toString(), 'ether');  // formated price because it comes in formate that we can't read 
           let item = { // represting nft
@@ -47,7 +47,7 @@ function index() {
             seller: i.seller,
             owner: i.owner,
             image: meta.data.image,
-            name: meta.data.name, 
+            title: meta.data.title, 
     
           }
           return item;

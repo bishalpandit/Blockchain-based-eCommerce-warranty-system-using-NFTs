@@ -13,11 +13,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <ChakraProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/">
-            <Route index element={<Home />} />
-            <Route path="/dashboard/*" element={<Dashboard />}/>
+          <Route path="/dashboard/*" element={<Dashboard />}/>
+            <Route path='/*' element={<Home />} />
             <Route path="*" element={<NotFound />} />
-          </Route>
+         
         </Routes>
       </BrowserRouter>
     </ChakraProvider>

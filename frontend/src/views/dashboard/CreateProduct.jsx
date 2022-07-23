@@ -21,8 +21,6 @@ import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { useFileUpload } from 'use-file-upload';
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
-import axios from 'axios';
-import FormData from 'form-data';
 import { useForm } from "react-hook-form";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Market from '../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
@@ -66,7 +64,7 @@ export default function CreateProduct() {
     let contract = new ethers.Contract(nftAddress, NFT.abi, signer)
     let transaction = await contract.createToken(url);
     let tx = await transaction.wait()
-
+    console.log(tx);
     let event = tx.events[0]
     let value = event.args[2]
     let tokenId = value.toNumber()
@@ -82,24 +80,16 @@ export default function CreateProduct() {
     )
 
     await transaction.wait()
-    router.push('/')
   }
 
   const createProductHandler = async (data) => {
-    //Upload file to IPFS using Pinata
-    //Get CID of uploaded file
-    //Prepare schema of product with CID as url
-    // Use smart contract to deploy in ethereum
-    console.log(data)
     if (!file)
       return;
     try {
       const added = await client.add(
         file.file,
       )
-      console.log(added)
       const url = `${baseDataURL}${added.path}`
-      console.log(url)
       createItem(url, data);
     } catch (e) {
       console.log(e)

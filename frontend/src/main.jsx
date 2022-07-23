@@ -6,7 +6,6 @@ import { ChakraProvider } from '@chakra-ui/react'
 import Dashboard from './views/dashboard'
 import Home from './views/home'
 import NotFound from './components/NotFound'
-import CreateProduct from './views/dashboard/CreateProduct'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -7,7 +7,7 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "./NFT.sol";
 
-contract ProductNFT is ReentrancyGuard {
+contract Products is ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _itemIds;
     Counters.Counter private _itemsSold;
@@ -30,27 +30,25 @@ contract ProductNFT is ReentrancyGuard {
         uint256[] tokenIds;
         address payable seller;
         address payable owner;
+        address nftContract;
     }
 
 
     mapping(uint256 => Product) private idToProduct;
 
     function createProduct(
-        string calldata title,
-        string calldata description,
-        string calldata brand,
-        string calldata category,
+        string memory title,
+        string memory description,
+        string memory brand,
+        string memory category,
         uint256 price,
         uint8 warrantyPeriod,
         uint256[] memory serialNos,
         address nftAddress,
-        string calldata tokenURI
+        string memory tokenURI
     ) public payable nonReentrant {
         require(price > 0, "Price must be at least 1 wei");
-        require(
-            msg.value == listingPrice,
-            "Price must be equal to listing Price"
-        );
+
 
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
@@ -65,7 +63,8 @@ contract ProductNFT is ReentrancyGuard {
             warrantyPeriod,
             generateTokens(nftAddress, tokenURI, serialNos),
             payable(msg.sender),
-            payable(address(0))
+            payable(address(0)),
+            nftAddress
         );
 
     }

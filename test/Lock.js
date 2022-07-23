@@ -12,22 +12,25 @@ describe('Products', () => {
     await nft.deployed();
     const nftContractAddress = nft.address;
 
+    console.log(nftContractAddress);
+
+    const [_, buyerAddress] = await ethers.getSigners();
+
+    console.log(buyerAddress);
+
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', 20000, 12, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com");
+
+    console.log(await products.fetchProducts());
     // let listingPrice = await market.getListingPrice();
     // listingPrice = listingPrice.toString()
-
    
-
-     const auctionPrice = ethers.utils.parseUnits(100, 'ether'); // in how much amount we want to sell
-    // await nft.createToken("https://www.mytokenlocation.com")
-    // await nft.createToken("https://www.mytokenlocation2.com")
 
     // await market.createMarketItem(nftContractAddress, 1, auctionPrice, {value: listingPrice})
     // await market.createMarketItem(nftContractAddress, 2, auctionPrice, {value: listingPrice})
-    let product = await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', 20000, 12, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com");
-    console.log(product);
-    const [_, buyerAddress] = await ethers.getSigners();
-
-    await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, {value: auctionPrice})
+    
+  
+   
+    //await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, {value: auctionPrice})
 
     // let items = await market.fetchMarketItems()
     // let myItems = await market.connect(buyerAddress).fetchMyNFTs()

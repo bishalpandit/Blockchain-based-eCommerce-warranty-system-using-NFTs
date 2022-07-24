@@ -52,7 +52,7 @@ contract Products is ReentrancyGuard {
 
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
-
+        
         idToProduct[itemId] = Product(
             itemId,
             title,
@@ -69,6 +69,48 @@ contract Products is ReentrancyGuard {
 
     }
 
+    // sell nft 
+    function sellProduct(
+        uint256 itemId
+    ) public payable nonReentrant {
+        // get product 
+        Product storage product = idToProduct[itemId];
+        // get price 
+        uint256 price = product.price;
+
+
+        // pay price 
+        require(msg.value == price, "Please pay the entire price in order to purchase the product");
+
+        // get last token id and remove it from current product
+        uint256  lastTokenId = product.tokenIds[product.tokenIds.length - 1];
+        idToProduct[itemId].tokenIds.pop();
+
+        // product.seller.transfer(msg.value); 
+        IERC721(product.nftContract).transferFrom(address(product.seller), msg.sender, lastTokenId); 
+
+        // create new product with new item id and set current owner to msg.sender
+        _itemIds.increment();
+        uint256 newItemId = _itemIds.current();
+        Product memory newProduct = Product(
+            newItemId,
+            product.title,
+            product.description,
+            product.brand,
+            product.category,
+            2,
+            product.warrantyPeriod,
+            product.tokenIds,
+            payable(product.seller),
+            payable(msg.sender),
+            product.nftContract
+        );
+        idToProduct[newItemId] = newProduct;
+        _itemsSold.increment();
+
+    }
+
+
     function generateTokens(
         address nftAddress,
         string memory tokenURI,
@@ -81,6 +123,10 @@ contract Products is ReentrancyGuard {
                 tokenURI,
                 serialNos[i]
             );
+
+            // NFT(nftAddress).TransferItem(tokens[i], nftAddress);
+            // IERC721(nftAddress).transferFrom(msg.sender, address(this), tokens[i]);
+            IERC721(nftAddress).transferFrom(msg.sender, address(this), tokens[i]);
         }
 
         return tokens;

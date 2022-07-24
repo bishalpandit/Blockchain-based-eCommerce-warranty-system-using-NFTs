@@ -19,7 +19,15 @@ contract NFT is ERC721URIStorage {
         uint256 tokenId = serialNo;
         _mint(msg.sender, tokenId);
          _setTokenURI(tokenId, tokenURI);
-        // setApprovalForAll(contractAddress, true); 
+        //  if (isApprovedForAll(msg.sender, contractAddress)) {
+        //     setApprovalForAll(msg.sender, true);
+        // }
         return tokenId;
     }
+
+
+    // function TransferItem(uint256 tokenId, address nftAddress) external {
+    //     IERC721(nftAddress).transferFrom(msg.sender, contractAddress, tokenId);
+
+    // }
 } 

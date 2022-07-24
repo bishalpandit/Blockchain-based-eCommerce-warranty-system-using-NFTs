@@ -12,13 +12,14 @@ describe('Products', () => {
     await nft.deployed();
     const nftContractAddress = nft.address;
 
-    console.log(nftContractAddress);
+    const auctionPrice = ethers.utils.parseUnits('100', 'ether');
+    // const auctionPrice = ethers.utils.parseUnits('100', 'ether');
 
     const [_, buyerAddress] = await ethers.getSigners();
 
-    console.log(buyerAddress);
+    // console.log("buyerAddress", buyerAddress);
 
-    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', 20000, 12, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com");
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 12, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com");
 
     console.log(await products.fetchProducts());
     // let listingPrice = await market.getListingPrice();
@@ -30,7 +31,7 @@ describe('Products', () => {
     
   
    
-    //await market.connect(buyerAddress).createMarketSale(nftContractAddress, 1, {value: auctionPrice})
+    await products.connect(buyerAddress).sellProduct(1, {value: auctionPrice})
 
     // let items = await market.fetchMarketItems()
     // let myItems = await market.connect(buyerAddress).fetchMyNFTs()

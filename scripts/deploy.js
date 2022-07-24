@@ -7,14 +7,13 @@
 const hre = require("hardhat");
 
 async function main() {
-  const NFTMarket = await hre.ethers.getContractFactory("NFTMarket");
-  const nftMarket = await NFTMarket.deploy();
+  const Products = await hre.ethers.getContractFactory("Products");
+  const products = await Products.deploy();
+  await products.deployed();
+  console.log("Products deployed to : ", products.address);
 
-  await nftMarket.deployed();
-
-  console.log("nftMarket deployed to : ", nftMarket.address);
   const NFT = await hre.ethers.getContractFactory("NFT");
-  const nft = await NFT.deploy(nftMarket.address);// reference to 
+  const nft = await NFT.deploy(products.address);
   await nft.deployed();
   console.log("nft deployed to: nft.", nft.address);
 }

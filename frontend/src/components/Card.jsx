@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
 import { nftAddress, nftMarketAddress } from "../config";
+import { MdContentCopy } from "react-icons/md";
 
 import NFT from "../../../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
@@ -130,6 +131,13 @@ function Card({ image, title, price, description, tokenId }) {
       <Image src={image} alt={`Picture of ${title}`} roundedTop="lg" />
 
       <Box p="6">
+        <Box d="flex" alignItems="baseline">
+            <Badge rounded="full" px="2" fontSize="0.8em">
+              <Box >
+                <MdContentCopy /> 10
+              </Box>
+            </Badge>
+        </Box>
         <Box d="flex" alignItems="baseline" />
         <Flex mt="1" justifyContent="space-between" alignContent="center">
           <Box fontSize="2xl" fontWeight="semibold" as="h4" lineHeight="tight">
@@ -157,7 +165,7 @@ function Card({ image, title, price, description, tokenId }) {
           {description}
         </Text>
         <Flex justifyContent="space-between" alignContent="center">
-          <Rating rating={5} numReviews={22} />
+          {/* <Rating rating={5} numReviews={22} style={{display: 'flex'}}/> */}
           <Box fontSize="2xl" color={useColorModeValue("gray.800", "white")}>
             <Box as="span" color={"gray.600"} fontSize="lg">
               ₹

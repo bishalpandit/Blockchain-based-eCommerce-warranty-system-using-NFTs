@@ -10,8 +10,9 @@ import { nftAddress, nftMarketAddress } from "../../config";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Market from '../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
 import Navbar  from './Navbar';
+import Footer from './Footer';
 import CaptionCarousel from './Carousel';
-import { Box, Center, Container, Flex, Grid, Wrap, WrapItem } from '@chakra-ui/react';
+import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem } from '@chakra-ui/react';
 
 const data = [{
   isNew: true,
@@ -113,18 +114,18 @@ export default function Index() {
     <>
     <Navbar />
     <CaptionCarousel />
-    <Container maxW='2xl' centerContent>
+    <Container maxW={'10xl'} centerContent my={10}>
       <Box>
-        <div>
+      <SimpleGrid columns={[1, 1, 2, 3]} spacing='40px'>
           {
             data.map((nft, i) => (
               <Card key={i} {...nft} />
             ))
           }
-        </div>
-          
+        </SimpleGrid>
       </Box>
     </Container>
+    <Footer />
     </>
   )
 

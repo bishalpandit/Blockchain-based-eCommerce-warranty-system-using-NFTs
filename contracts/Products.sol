@@ -33,7 +33,6 @@ contract Products is ReentrancyGuard {
         address nftContract;
     }
 
-
     mapping(uint256 => Product) private idToProduct;
 
     function createProduct(
@@ -47,12 +46,12 @@ contract Products is ReentrancyGuard {
         address nftAddress,
         string memory tokenURI
     ) public payable nonReentrant {
-        require(price > 0, "Price must be at least 1 wei");
-
+        //require(price > 0, "Price must be at least 1 wei");
+        //require(msg.value > 0, "Price must be equal to listing Price");
 
         _itemIds.increment();
         uint256 itemId = _itemIds.current();
-        
+
         idToProduct[itemId] = Product(
             itemId,
             title,
@@ -66,28 +65,35 @@ contract Products is ReentrancyGuard {
             payable(address(0)),
             nftAddress
         );
-
     }
 
-    // sell nft 
-    function sellProduct(
-        uint256 itemId
-    ) public payable nonReentrant {
-        // get product 
+    // sell nft
+    function sellProduct(uint256 itemId) public payable nonReentrant {
+        // get product
         Product storage product = idToProduct[itemId];
-        // get price 
+        // get price
         uint256 price = product.price;
 
-
-        // pay price 
-        require(msg.value == price, "Please pay the entire price in order to purchase the product");
+        // pay price
+        require(
+            msg.value == price,
+            "Please pay the entire price in order to purchase the product"
+        );
 
         // get last token id and remove it from current product
-        uint256  lastTokenId = product.tokenIds[product.tokenIds.length - 1];
+        uint256 lastTokenId = product.tokenIds[product.tokenIds.length - 1];
         idToProduct[itemId].tokenIds.pop();
 
-        // product.seller.transfer(msg.value); 
-        IERC721(product.nftContract).transferFrom(address(product.seller), msg.sender, lastTokenId); 
+       uint256[] memory buyerTokens = new uint256[](1);
+
+       buyerTokens[0] = lastTokenId;
+
+        // product.seller.transfer(msg.value);
+        IERC721(product.nftContract).transferFrom(
+            address(this),
+            msg.sender,
+            lastTokenId
+        );
 
         // create new product with new item id and set current owner to msg.sender
         _itemIds.increment();
@@ -98,18 +104,16 @@ contract Products is ReentrancyGuard {
             product.description,
             product.brand,
             product.category,
-            2,
+            product.price,
             product.warrantyPeriod,
-            product.tokenIds,
+            buyerTokens,
             payable(product.seller),
             payable(msg.sender),
             product.nftContract
         );
         idToProduct[newItemId] = newProduct;
         _itemsSold.increment();
-
     }
-
 
     function generateTokens(
         address nftAddress,
@@ -119,29 +123,63 @@ contract Products is ReentrancyGuard {
         uint256[] memory tokens = new uint256[](serialNos.length);
 
         for (uint8 i = 0; i < serialNos.length; i++) {
-            tokens[i] = NFT(nftAddress).createToken(
-                tokenURI,
-                serialNos[i]
-            );
-
-            // NFT(nftAddress).TransferItem(tokens[i], nftAddress);
-            // IERC721(nftAddress).transferFrom(msg.sender, address(this), tokens[i]);
-            IERC721(nftAddress).transferFrom(msg.sender, address(this), tokens[i]);
+            tokens[i] = NFT(nftAddress).createToken(tokenURI, serialNos[i]);
         }
 
         return tokens;
     }
 
-    function fetchProducts() public view returns (Product[] memory) {
-        uint itemsCount = _itemIds.current();
+    function getProducts() public view returns (Product[] memory) {
+        uint256 itemsCount = _itemIds.current();
 
         Product[] memory items = new Product[](_itemIds.current());
 
-        for(uint i = 1; i <= itemsCount; i++) {
-            items[i - 1] = idToProduct[i]; 
+        for (uint256 i = 1; i <= itemsCount; i++) {
+            items[i - 1] = idToProduct[i];
         }
-  
+
         return items;
     }
-}
 
+    function getMyProducts() public view returns (Product[] memory) {
+        uint totalProductCount = _itemIds.current();
+        uint myProductCount = 0;
+        uint currentIndex = 0;
+
+        for (uint i=0; i < totalProductCount; i++) {
+            if (idToProduct[i+1].owner == msg.sender) {
+                myProductCount += 1;
+            }
+        }
+
+        Product[] memory myProducts = new Product[](myProductCount);
+
+        for (uint i = 0; i < totalProductCount; i++) {
+            if (idToProduct[i+1].owner == msg.sender) {
+                uint currentId = idToProduct[i+1].itemId; 
+                Product storage currentItem = idToProduct[currentId];
+                myProducts[currentIndex] = currentItem; 
+                currentIndex += 1;
+            }
+        }
+
+        return myProducts;
+    }
+
+    function getTokenOwner(uint256 tokenId, address nftContract)
+        public
+        view
+        returns (address)
+    {
+        return NFT(nftContract).getTokenOwner(tokenId);
+    }
+
+    function getBuyerAddress() public view returns (address) {
+        return msg.sender;
+    }
+
+    function getLastToken(uint256 itemId) public view returns (uint256) {
+        uint256 lastTokenId = idToProduct[itemId].tokenIds[idToProduct[itemId].tokenIds.length - 1];
+        return lastTokenId;
+    } 
+}

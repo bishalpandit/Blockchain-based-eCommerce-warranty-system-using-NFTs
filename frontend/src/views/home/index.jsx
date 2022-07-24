@@ -72,7 +72,7 @@ function Index() {
 function Main() {
   return (
   <Routes>
-  <Route path="/product" element={<ProductDetails />} />
+      <Route path="/product" element={<ProductDetails />} />
       <Route path='/' element={<Index />} />
   </Routes>
   )

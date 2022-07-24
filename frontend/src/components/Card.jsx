@@ -16,10 +16,10 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-import { nftAddress, nftMarketAddress } from "../config";
+import { nftAddress, productsAddress } from "../config";
 
 import NFT from "../../../artifacts/contracts/NFT.sol/NFT.json";
-import Market from "../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
+import Products from "../../../artifacts/contracts/Products.sol/Products.json";
 
 const data = {
   isNew: true,
@@ -57,65 +57,22 @@ function Rating({ rating, numReviews }) {
   );
 }
 
-function Card({ image, title, price, description, tokenId }) {
-  const [nfts, setNFTs] = useState([]);
-  const [loadingState, setLoadingState] = useState("not-loaded");
+function Card({ itemId, image, title, price, description, tokenIds }) {
 
-  useEffect(() => {
-    loadNFTs();
-  }, []);
-  async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcBatchProvider(); // provider for read operation
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider); // setup contract
-    const marketContract = new ethers.Contract(
-      nftMarketAddress,
-      Market.abi,
-      provider
-    ); // setup contract
-    // get tokenURI by intracting with tokenContract
-    const data = await marketContract.fetchMarketItems();
-
-    const items = await Promise.all(
-      data.map(async i => {
-        // map over all the items
-
-        const tokenUri = await tokenContract.tokenURI(i.tokenId); // from tokenContract get tokenUri
-        const meta = await axios.get(tokenUri); //https://ipfs-url , get meta data from ipfs
-        let price = ethers.utils.formatUnits(i.price.toString(), "ether"); // formated price because it comes in formate that we can't read
-        let item = {
-          // represting nft
-          price,
-          tokenId: i.tokenId.toNumber(),
-          seller: i.seller,
-          owner: i.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description
-        };
-
-        return item;
-      })
-    );
-
-    setNFTs(items);
-    setLoadingState("loaded");
-  }
   // buying nft
-  async function buyNFT(tokenId, price) {
-    const web3Modal = new Web3Modal(); // look for instance for etherum being injected in browser
-    const connection = await web3Modal.connect(); //connect to wallet
-    const provider = new ethers.providers.Web3Provider(connection); // create provider
+  async function buyNFT(itemId, price) {
+    const web3Modal = new Web3Modal(); 
+    const connection = await web3Modal.connect(); 
+    const provider = new ethers.providers.Web3Provider(connection); 
 
-    const signer = provider.getSigner(); // as it is transaction we have to sign it
-    const contract = new ethers.Contract(nftMarketAddress, Market.abi, signer); // we to provider signer
+    const signer = provider.getSigner(); 
+    const contract = new ethers.Contract(productsAddress, Products.abi, signer); 
     const newPrice = ethers.utils.parseUnits(price.toString(), "ether");
-    const transaction = await contract.createMarketSale(nftAddress, tokenId, {
-      // call createMarketSale
+    const transaction = await contract.sellProduct(itemId, {
       value: newPrice
     });
 
-    await transaction.wait(); // wait for transaction
-    loadNFTs(); // load page as this nft should not see in page
+    await transaction.wait(); 
   }
 
   return (
@@ -148,7 +105,7 @@ function Card({ image, title, price, description, tokenId }) {
                 h={7}
                 w={7}
                 alignSelf={"center"}
-                onClick={() => buyNFT(tokenId, price)}
+                onClick={() => buyNFT(itemId, price)}
               />
             </chakra.a>
           </Tooltip>

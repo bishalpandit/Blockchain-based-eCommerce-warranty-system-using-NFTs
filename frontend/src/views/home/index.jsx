@@ -6,10 +6,10 @@ import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import axios from 'axios';
 import Web3Modal from 'web3modal'
-import { nftAddress, nftMarketAddress } from "../../config";
+import { nftAddress, productsAddress } from "../../config";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
-import Market from '../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
-import Navbar  from './Navbar';
+import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
+import Navbar from './Navbar';
 import CaptionCarousel from './Carousel';
 import { Box, Center, Container, Flex, Grid, Wrap, WrapItem } from '@chakra-ui/react';
 
@@ -82,18 +82,21 @@ export default function Index() {
     loadNFTs()
   }, []);
   async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcBatchProvider(); // provider for read operation
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider); // setup contract 
-    const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, provider); // setup contract 
-    // get tokenURI by intracting with tokenContract 
-    const data = await marketContract.fetchMarketItems();
-    const items = await Promise.all(data.map(async i => { // map over all the items 
-      const tokenUri = await tokenContract.tokenURI(i.tokenId)  // from tokenContract get tokenUri 
-      const meta = await axios.get(tokenUri) //https://ipfs-url , get meta data from ipfs 
-      let price = ethers.utils.formatUnits(i.price.toString(), 'ether');  // formated price because it comes in formate that we can't read 
-      let item = { // represting nft
+    const provider = new ethers.providers.JsonRpcBatchProvider();
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+    const productsContract = new ethers.Contract(productsAddress, Products.abi, provider);
+
+    const data = await productsContract.getProducts();
+
+    const items = await Promise.all(data.map(async i => {
+      const tokenUri = await tokenContract.tokenURI(i.tokenIds[0])
+      const meta = await axios.get(tokenUri)
+      let price = ethers.utils.formatUnits(i.price.toString(), 'ether');
+      let tokenIds = i.tokenIds.map((token) => token.toString());
+      let item = {
+        itemId: i.itemId.toString(),
         price,
-        tokenId: i.tokenId.toNumber(),
+        tokenIds,
         seller: i.seller,
         owner: i.owner,
         image: meta.data.image,
@@ -102,6 +105,7 @@ export default function Index() {
       }
       return item;
     }))
+
     setNFTs(items)
     setLoadingState('loaded');
   }
@@ -111,22 +115,21 @@ export default function Index() {
   )
   return (
     <>
-    <Navbar />
-    <CaptionCarousel />
-    <Container maxW='2xl' centerContent>
-      <Box>
-        <div>
-          {
-            data.map((nft, i) => (
-              <Card key={i} {...nft} />
-            ))
-          }
-        </div>
-          
-      </Box>
-    </Container>
+      <Navbar />
+      <CaptionCarousel />
+      <Container maxW='2xl' centerContent>
+        <Box>
+          <div>
+            {
+              nfts.map((nft, i) => (
+                <Card key={i} {...nft} />
+              ))
+            }
+          </div>
+
+        </Box>
+      </Container>
     </>
   )
 
 }
- 

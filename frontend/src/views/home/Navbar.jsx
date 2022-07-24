@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import {
   Box,
   Flex,
@@ -17,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 
-const Links = ['Dashboard', 'Profile'];
+const Links = ['Dashboard', 'Projects', 'Team'];
 
 const NavLink = ({ children }) => (
   <Link
@@ -48,7 +49,7 @@ export default function Navbar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box>Flipkart 2.0</Box>
+            <Box>Logo</Box>
             <HStack
               as={'nav'}
               spacing={4}
@@ -82,10 +83,10 @@ export default function Navbar() {
                 />
               </MenuButton>
               <MenuList>
-                <MenuItem>Dashboard</MenuItem>
-                <MenuItem>Messages</MenuItem>
+                <MenuItem>Link 1</MenuItem>
+                <MenuItem>Link 2</MenuItem>
                 <MenuDivider />
-                <MenuItem>Settings</MenuItem>
+                <MenuItem>Link 3</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -101,6 +102,8 @@ export default function Navbar() {
           </Box>
         ) : null}
       </Box>
+
+      <Box p={4}>Main Content Here</Box>
     </>
   );
 }

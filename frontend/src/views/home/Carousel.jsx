@@ -29,7 +29,7 @@ const settings = {
 export default function CaptionCarousel() {
   // As we have used custom buttons, we need a reference variable to
   // change the state
-  const [slider, setSlider] = React.useState<Slider | null>(null);
+  // const [slider, setSlider] = React.useState<Slider | null>(null);
 
   // These are the breakpoints which changes the position of the
   // buttons as the screen size changes
@@ -81,7 +81,7 @@ export default function CaptionCarousel() {
         href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
       />
       {/* Left Icon */}
-      <IconButton
+      {/* <IconButton
         aria-label="left-arrow"
         variant="ghost"
         position="absolute"
@@ -91,9 +91,9 @@ export default function CaptionCarousel() {
         zIndex={2}
         onClick={() => slider?.slickPrev()}>
         <BiLeftArrowAlt size="40px" />
-      </IconButton>
+      </IconButton> */}
       {/* Right Icon */}
-      <IconButton
+      {/* <IconButton
         aria-label="right-arrow"
         variant="ghost"
         position="absolute"
@@ -103,9 +103,9 @@ export default function CaptionCarousel() {
         zIndex={2}
         onClick={() => slider?.slickNext()}>
         <BiRightArrowAlt size="40px" />
-      </IconButton>
+      </IconButton> */}
       {/* Slider */}
-      <Slider {...settings} ref={(slider) => setSlider(slider)}>
+      <Slider {...settings} >
         {cards.map((card, index) => (
           <Box
             key={index}

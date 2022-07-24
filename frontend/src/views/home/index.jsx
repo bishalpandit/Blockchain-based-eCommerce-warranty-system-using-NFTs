@@ -7,14 +7,77 @@ import { useEffect, useState } from 'react'
 import axios from 'axios';
 import Web3Modal from 'web3modal'
 import { nftAddress, nftMarketAddress } from "../../config";
-
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Market from '../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json'
+import Navbar  from './Navbar';
+import CaptionCarousel from './Carousel';
+import { Box, Center, Container, Flex, Grid, Wrap, WrapItem } from '@chakra-ui/react';
 
-function Index() {
+const data = [{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+},
+{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+},
+{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+},
+{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+},
+{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+},
+{
+  isNew: true,
+  image:
+    "https://images.unsplash.com/photo-1572635196237-14b3f281503f?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=4600&q=80",
+  title: "Wayfarer Classic",
+  description: "A very nice description ahead",
+  price: 450,
+  rating: 4.2,
+  numReviews: 34
+}];
+
+
+export default function Index() {
   const [nfts, setNFTs] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
-
   useEffect(() => {
     loadNFTs()
   }, []);
@@ -24,9 +87,7 @@ function Index() {
     const marketContract = new ethers.Contract(nftMarketAddress, Market.abi, provider); // setup contract 
     // get tokenURI by intracting with tokenContract 
     const data = await marketContract.fetchMarketItems();
-
     const items = await Promise.all(data.map(async i => { // map over all the items 
-
       const tokenUri = await tokenContract.tokenURI(i.tokenId)  // from tokenContract get tokenUri 
       const meta = await axios.get(tokenUri) //https://ipfs-url , get meta data from ipfs 
       let price = ethers.utils.formatUnits(i.price.toString(), 'ether');  // formated price because it comes in formate that we can't read 
@@ -38,44 +99,34 @@ function Index() {
         image: meta.data.image,
         title: meta.data.title,
         description: meta.data.description,
-
       }
-
       return item;
     }))
-
     setNFTs(items)
     setLoadingState('loaded');
   }
 
- 
   if (loadingState == 'loaded' && !nfts.length) return (
     <h1 className='px-20 py-10 text-3xl '> No items in marketplace</h1>
   )
   return (
-    <div className='flex justify-center'>
-      <div className='px-4' style={{ maxWidth: "1600px" }}>
-        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4'>
+    <>
+    <Navbar />
+    <CaptionCarousel />
+    <Container maxW='2xl' centerContent>
+      <Box>
+        <div>
           {
-            nfts.map((nft, i) => (
+            data.map((nft, i) => (
               <Card key={i} {...nft} />
             ))
           }
         </div>
-      </div>
-
-    </div>
+          
+      </Box>
+    </Container>
+    </>
   )
-  
-}
 
-function Main() {
-  return (
-  <Routes>
-  <Route path="/product" element={<ProductDetails />} />
-      <Route path='/' element={<Index />} />
-  </Routes>
-  )
 }
-
-export default Main
+ 

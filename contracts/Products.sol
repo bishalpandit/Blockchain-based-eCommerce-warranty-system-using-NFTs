@@ -131,11 +131,21 @@ contract Products is ReentrancyGuard {
 
     function getProducts() public view returns (Product[] memory) {
         uint256 itemsCount = _itemIds.current();
+        uint256 unsoldItemsCount = 0;
 
-        Product[] memory items = new Product[](_itemIds.current());
+        for(uint256 i=1; i<=itemsCount; i++) {
+            if(idToProduct[i].owner == address(0)) {
+                unsoldItemsCount++;
+            }
+        }
+        Product[] memory items = new Product[](unsoldItemsCount);
 
+        uint256 index = 0;
         for (uint256 i = 1; i <= itemsCount; i++) {
-            items[i - 1] = idToProduct[i];
+            if(idToProduct[i].owner == address(0)) {
+                items[index] = idToProduct[i];
+                index++;
+            }
         }
 
         return items;

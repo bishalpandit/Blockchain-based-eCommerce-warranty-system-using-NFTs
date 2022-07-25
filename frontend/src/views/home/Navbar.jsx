@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 
-const Links = ['Dashboard', 'Projects', 'Team'];
+const Links = [{to: '/dashboard', value: 'Dashboard'}];
 
 const NavLink = ({ children }) => (
   <Link
@@ -29,8 +29,8 @@ const NavLink = ({ children }) => (
       textDecoration: 'none',
       bg: useColorModeValue('gray.200', 'gray.700'),
     }}
-    href={'#'}>
-    {children}
+    href={children.to}>
+    {children.value}
   </Link>
 );
 
@@ -49,13 +49,13 @@ export default function Navbar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box>Logo</Box>
+            <Box>MintKart</Box>
             <HStack
               as={'nav'}
               spacing={4}
               display={{ base: 'none', md: 'flex' }}>
               {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+                <NavLink key={link.value}>{link}</NavLink>
               ))}
             </HStack>
           </HStack>
@@ -66,7 +66,7 @@ export default function Navbar() {
               size={'sm'}
               mr={4}
               leftIcon={<AddIcon />}>
-              Action
+              Connect to wallet
             </Button>
             <Menu>
               <MenuButton
@@ -102,8 +102,6 @@ export default function Navbar() {
           </Box>
         ) : null}
       </Box>
-
-      <Box p={4}>Main Content Here</Box>
     </>
   );
 }

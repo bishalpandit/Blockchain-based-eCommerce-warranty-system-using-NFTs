@@ -8,7 +8,7 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 
 
-import Index from "./index";
+import Index from "./Index";
 
 function HomeRoutes() {
   return (

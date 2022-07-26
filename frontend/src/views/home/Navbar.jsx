@@ -17,6 +17,7 @@ import {
   Stack,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
+import logo from '../../images/logo.png';
 
 const Links = [{to: '/dashboard', value: 'Dashboard'}];
 
@@ -49,7 +50,7 @@ export default function Navbar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box>MintKart</Box>
+            <Box><img src={logo} alt="logo" width="100px" /></Box>
             <HStack
               as={'nav'}
               spacing={4}

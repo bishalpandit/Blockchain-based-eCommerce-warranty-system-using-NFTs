@@ -5,12 +5,12 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "hardhat/console.sol";
 import "./NFT.sol";
 
 contract Products is ReentrancyGuard {
     using Counters for Counters.Counter;
     Counters.Counter private _itemIds;
-    Counters.Counter private _itemsSold;
 
     address payable owner;
     uint256 listingPrice = 0.025 ether;
@@ -96,8 +96,11 @@ contract Products is ReentrancyGuard {
         );
 
         // create new product with new item id and set current owner to msg.sender
-        _itemIds.increment();
-        uint256 newItemId = _itemIds.current();
+        uint256 newItemId = product.itemId;
+        if(product.tokenIds.length > 0) {
+            _itemIds.increment();
+             newItemId = _itemIds.current();
+        }
         Product memory newProduct = Product(
             newItemId,
             product.title,
@@ -112,7 +115,6 @@ contract Products is ReentrancyGuard {
             product.nftContract
         );
         idToProduct[newItemId] = newProduct;
-        _itemsSold.increment();
     }
 
     function generateTokens(
@@ -131,11 +133,21 @@ contract Products is ReentrancyGuard {
 
     function getProducts() public view returns (Product[] memory) {
         uint256 itemsCount = _itemIds.current();
+        uint256 unsoldItemsCount = 0;
 
-        Product[] memory items = new Product[](_itemIds.current());
+        for(uint256 i=1; i<=itemsCount; i++) {
+            if(idToProduct[i].owner == address(0)) {
+                unsoldItemsCount++;
+            }
+        }
+        Product[] memory items = new Product[](unsoldItemsCount);
 
+        uint256 index = 0;
         for (uint256 i = 1; i <= itemsCount; i++) {
-            items[i - 1] = idToProduct[i];
+            if(idToProduct[i].owner == address(0)) {
+                items[index] = idToProduct[i];
+                index++;
+            }
         }
 
         return items;
@@ -189,5 +201,51 @@ contract Products is ReentrancyGuard {
             idToProduct[itemId].tokenIds.length - 1
         ];
         return lastTokenId;
+    } 
+
+    function transferProduct(uint256 itemId, address payable receiver) public payable nonReentrant {
+        Product storage product = idToProduct[itemId];
+        require(
+            msg.sender == product.owner || msg.sender == product.seller,
+            "You are not the owner or seller of this product"
+        );
+       
+        // get last token id and remove it from current product
+        uint256 lastTokenId = product.tokenIds[product.tokenIds.length - 1];
+        idToProduct[itemId].tokenIds.pop();
+
+        uint256[] memory buyerTokens = new uint256[](1);
+       buyerTokens[0] = lastTokenId;
+        console.log("sender is ", msg.sender);
+        console.log("owner is ", NFT(product.nftContract).getTokenOwner(lastTokenId));
+        // NFT(product.nftContract).giveOwnershipToContract();
+        //  NFT(product.nftContract).approve(address(this) ,lastTokenId);
+        console.log("approved address", NFT(product.nftContract).getApproved(lastTokenId));
+        IERC721(product.nftContract).transferFrom(
+            msg.sender,
+            receiver,
+            lastTokenId
+        );
+
+        // create new product with new item id and set current owner to msg.sender
+        uint256 newItemId = product.itemId;
+        if(product.tokenIds.length > 0) {
+            _itemIds.increment();
+             newItemId = _itemIds.current();
+        }
+        Product memory newProduct = Product(
+            newItemId,
+            product.title,
+            product.description,
+            product.brand,
+            product.category,
+            product.price,
+            product.warrantyPeriod,
+            buyerTokens,
+            payable(msg.sender),
+            payable(receiver),
+            product.nftContract
+        );
+        idToProduct[newItemId] = newProduct;
     }
 }

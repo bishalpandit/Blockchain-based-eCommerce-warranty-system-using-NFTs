@@ -26,6 +26,11 @@ contract NFT is ERC721URIStorage {
     function getTokenOwner(uint256 tokenId) external view returns (address) {
         return ownerOf(tokenId);
     }
+
+     function giveOwnershipToContract() external   {
+         setApprovalForAll(contractAddress, true);
+         
+    }
     // function TransferItem(uint256 tokenId, address nftAddress) external {
     //     IERC721(nftAddress).transferFrom(msg.sender, contractAddress, tokenId);
 

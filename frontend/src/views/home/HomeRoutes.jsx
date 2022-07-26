@@ -11,12 +11,14 @@ import { nftAddress, nftMarketAddress } from "../../config";
 import NFT from "../../../../artifacts/contracts/NFT.sol/NFT.json";
 import Market from "../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json";
 
-import Index from "./Index";
+import Index from "./index";
 
 function HomeRoutes() {
   return (
     <Routes>
-      <Route path="/product" element={<ProductDetails />} />
+      <Route path="/product/*">
+        <Route path=":id" element={<ProductDetails />} />
+      </Route>
       <Route path="/" element={<Index />} />
     </Routes>
   );

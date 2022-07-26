@@ -1,41 +1,94 @@
 import {
     Box,
-    chakra,
     Container,
     Stack,
     Text,
     Image,
     Flex,
-    VStack,
     Button,
     Heading,
     SimpleGrid,
     StackDivider,
     useColorModeValue,
-    VisuallyHidden,
     List,
     ListItem,
     ChakraProvider
 } from '@chakra-ui/react';
-import { FaInstagram, FaTwitter, FaYoutube } from 'react-icons/fa';
-import { MdLocalShipping } from 'react-icons/md';
+import Web3Modal from 'web3modal';
+import { BigNumber, ethers } from 'ethers';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-export default function Simple() {
+import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
+import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
+import { nftAddress, productsAddress } from "../../config";
+import Navbar from './Navbar';
+
+
+export default function ProductDetails() {
+    const [product, setProduct] = useState(null);
+    const { id } = useParams();
+
+    useEffect(() => {
+        loadNFTById();
+    }, []);
+
+    async function loadNFTById() {
+        const provider = new ethers.providers.JsonRpcBatchProvider();
+        const productContract = new ethers.Contract(productsAddress, Products.abi, provider);
+        const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+
+        const product = await productContract.getProductById(BigNumber.from(id));
+        const tokenUri = await tokenContract.tokenURI(product.tokenIds[0]);
+        const meta = (await axios.get(tokenUri)).data;
+        let price = ethers.utils.formatUnits(product.price.toString(), 'ether');
+
+        const tokens = await Promise.all(product.tokenIds.map(async t => {
+            return t.toNumber();
+        }));
+
+        setProduct({
+            ...product,
+            tokens,
+            price,
+            image: meta.image
+        });
+    }
+
+    async function buyNFT() {
+        const web3Modal = new Web3Modal();
+        const connection = await web3Modal.connect();
+        const provider = new ethers.providers.Web3Provider(connection);
+
+        const signer = provider.getSigner();
+        const productsContract = new ethers.Contract(productsAddress, Products.abi, signer); // we to provider signer 
+        const newPrice = ethers.utils.parseUnits(price.toString(), 'ether');
+        const transaction = await contract.createMarketSale(nftAddress, tokenId, {  // call createMarketSale
+            value: newPrice
+        })
+
+        await transaction.wait() // wait for transaction 
+        loadNFTs(); // load page as this nft should not see in page 
+
+    }
+
+    if (!product)
+        return;
+
     return (
-
-        <ChakraProvider  resetCss={false} w="100%">
+        <>
+            <Navbar />
             <Container maxW={'7xl'}>
                 <SimpleGrid
                     columns={{ base: 1, lg: 2 }}
                     spacing={{ base: 8, md: 10 }}
-                    py={{ base: 18, md: 24 }}>
+                    py={{ base: 4, md: 6 }}>
                     <Flex>
                         <Image
                             rounded={'md'}
                             alt={'product image'}
-                            src={
-                                'https://images.unsplash.com/photo-1596516109370-29001ec8ec36?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwyODE1MDl8MHwxfGFsbHx8fHx8fHx8fDE2Mzg5MzY2MzE&ixlib=rb-1.2.1&q=80&w=1080'
-                            }
+                            src={product.image}
                             fit={'cover'}
                             align={'center'}
                             w={'100%'}
@@ -48,16 +101,16 @@ export default function Simple() {
                                 lineHeight={1.1}
                                 fontWeight={600}
                                 fontSize={{ base: '2xl', sm: '4xl', lg: '5xl' }}>
-                                Automatic Watch
+                                {product.title}
                             </Heading>
                             <Heading as='h5' size='sm' color="gray.500" ps="3">
-                                By SamSung
+                                By {product.brand}
                             </Heading>
                             <Text
                                 color={useColorModeValue('gray.900', 'gray.400')}
                                 fontWeight={300}
                                 fontSize={'2xl'}>
-                                $350.00 USD
+                                Rs {product.price}
                             </Text>
                         </Box>
 
@@ -71,36 +124,10 @@ export default function Simple() {
                             }>
 
                             <Text fontSize={'lg'}>
-                                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ad
-                                aliquid amet at delectus doloribus dolorum expedita hic, ipsum
-                                maxime modi nam officiis porro, quae, quisquam quos
-                                reprehenderit velit? Natus, totam.
+                                {product.description}
                             </Text>
                             <Box>
                                 <Heading
-                                    as='h5' size='sm'
-                                    fontSize={{ base: '16px', lg: '18px' }}
-                                    color={'gray.500'}
-                                    textTransform={'uppercase'}
-                                    mb={'4'}>
-                                    Features
-                                </Heading>
-
-                                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-                                    <List spacing={2}>
-                                        <ListItem>Chronograph</ListItem>
-                                        <ListItem>Master Chronometer Certified</ListItem>{' '}
-                                        <ListItem>Tachymeter</ListItem>
-                                    </List>
-                                    <List spacing={2}>
-                                        <ListItem>Anti‑magnetic</ListItem>
-                                        <ListItem>Chronometer</ListItem>
-                                        <ListItem>Small seconds</ListItem>
-                                    </List>
-                                </SimpleGrid>
-                            </Box>
-                            <Box>
-                            <Heading
                                     as='h5' size='sm'
                                     fontSize={{ base: '16px', lg: '18px' }}
                                     color={'gray.500'}
@@ -114,56 +141,25 @@ export default function Simple() {
                                         <Text as={'span'} fontWeight={'bold'}>
                                             Warranty:
                                         </Text>{' '}
-                                        6 Months
+                                        {product.warrantyPeriod} Months
                                     </ListItem>
                                     <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>
-                                            Between lugs:
+                                            Category:
                                         </Text>{' '}
-                                        20 mm
+                                        {product.category}
                                     </ListItem>
                                     <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>
-                                            Bracelet:
+                                            Seller:
                                         </Text>{' '}
-                                        leather strap
-                                    </ListItem>
-                                    <ListItem>
-                                        <Text as={'span'} fontWeight={'bold'}>
-                                            Case:
-                                        </Text>{' '}
-                                        Steel
-                                    </ListItem>
-                                    <ListItem>
-                                        <Text as={'span'} fontWeight={'bold'}>
-                                            Case diameter:
-                                        </Text>{' '}
-                                        42 mm
-                                    </ListItem>
-                                    <ListItem>
-                                        <Text as={'span'} fontWeight={'bold'}>
-                                            Dial color:
-                                        </Text>{' '}
-                                        Black
-                                    </ListItem>
-                                    <ListItem>
-                                        <Text as={'span'} fontWeight={'bold'}>
-                                            Crystal:
-                                        </Text>{' '}
-                                        Domed, scratch‑resistant sapphire crystal with anti‑reflective
-                                        treatment inside
-                                    </ListItem>
-                                    <ListItem>
-                                        <Text as={'span'} fontWeight={'bold'}>
-                                            Water resistance:
-                                        </Text>{' '}
-                                        5 bar (50 metres / 167 feet){' '}
+                                        {product.seller}
                                     </ListItem>
                                 </List>
                             </Box>
                         </Stack>
-
                         <Button
+                            onClick={buyNFT}
                             w={['50%', '50%']}
                             mt={8}
                             size={'md'}
@@ -178,12 +174,10 @@ export default function Simple() {
                             }}>
                             Buy Now
                         </Button>
-
-
                     </Stack>
                 </SimpleGrid>
             </Container>
-        </ChakraProvider>
+        </>
 
     );
 }

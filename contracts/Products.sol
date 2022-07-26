@@ -68,7 +68,7 @@ contract Products is ReentrancyGuard {
     }
 
     // sell nft
-    function sellProduct(uint256 itemId) public payable nonReentrant {
+    function buyProduct(uint256 itemId) public payable nonReentrant {
         // get product
         Product storage product = idToProduct[itemId];
         // get price
@@ -84,9 +84,9 @@ contract Products is ReentrancyGuard {
         uint256 lastTokenId = product.tokenIds[product.tokenIds.length - 1];
         idToProduct[itemId].tokenIds.pop();
 
-       uint256[] memory buyerTokens = new uint256[](1);
+        uint256[] memory buyerTokens = new uint256[](1);
 
-       buyerTokens[0] = lastTokenId;
+        buyerTokens[0] = lastTokenId;
 
         // product.seller.transfer(msg.value);
         IERC721(product.nftContract).transferFrom(
@@ -141,24 +141,30 @@ contract Products is ReentrancyGuard {
         return items;
     }
 
-    function getMyProducts() public view returns (Product[] memory) {
-        uint totalProductCount = _itemIds.current();
-        uint myProductCount = 0;
-        uint currentIndex = 0;
+    function getProductById(uint256 itemId) public view returns (Product memory) {
+        uint256 itemsCount = _itemIds.current();
+        require(itemsCount >= itemId, "Invalid itemd id");
+        return idToProduct[itemId];
+    }
 
-        for (uint i=0; i < totalProductCount; i++) {
-            if (idToProduct[i+1].owner == msg.sender) {
+    function getMyProducts() public view returns (Product[] memory) {
+        uint256 totalProductCount = _itemIds.current();
+        uint256 myProductCount = 0;
+        uint256 currentIndex = 0;
+
+        for (uint256 i = 0; i < totalProductCount; i++) {
+            if (idToProduct[i + 1].owner == msg.sender) {
                 myProductCount += 1;
             }
         }
 
         Product[] memory myProducts = new Product[](myProductCount);
 
-        for (uint i = 0; i < totalProductCount; i++) {
-            if (idToProduct[i+1].owner == msg.sender) {
-                uint currentId = idToProduct[i+1].itemId; 
+        for (uint256 i = 0; i < totalProductCount; i++) {
+            if (idToProduct[i + 1].owner == msg.sender) {
+                uint256 currentId = idToProduct[i + 1].itemId;
                 Product storage currentItem = idToProduct[currentId];
-                myProducts[currentIndex] = currentItem; 
+                myProducts[currentIndex] = currentItem;
                 currentIndex += 1;
             }
         }
@@ -179,7 +185,9 @@ contract Products is ReentrancyGuard {
     }
 
     function getLastToken(uint256 itemId) public view returns (uint256) {
-        uint256 lastTokenId = idToProduct[itemId].tokenIds[idToProduct[itemId].tokenIds.length - 1];
+        uint256 lastTokenId = idToProduct[itemId].tokenIds[
+            idToProduct[itemId].tokenIds.length - 1
+        ];
         return lastTokenId;
-    } 
+    }
 }

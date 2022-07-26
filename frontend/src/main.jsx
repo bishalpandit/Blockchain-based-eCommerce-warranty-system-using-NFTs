@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 
 import Dashboard from "./views/dashboard";
-import Home from "./views/home/Index";
 import NotFound from "./components/NotFound";
 import HomeRoutes from "./views/home/HomeRoutes";
 

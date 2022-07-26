@@ -12,6 +12,7 @@ import Market from '../../../../artifacts/contracts/NFTMarket.sol/NFTMarket.json
 import Navbar  from './Navbar';
 import Footer from './Footer';
 import CaptionCarousel from './Carousel';
+import { Link } from 'react-router-dom'
 import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem } from '@chakra-ui/react';
 
 const data = [{

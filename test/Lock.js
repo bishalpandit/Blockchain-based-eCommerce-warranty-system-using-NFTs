@@ -22,7 +22,7 @@ describe('Products', () => {
 
     console.log(await products.getProducts());
    
-    await products.connect(buyerAddress).sellProduct(1, { value: auctionPrice });
+    await products.connect(buyerAddress).buyProduct(1, { value: auctionPrice });
 
     console.log("Current Token owner: " + await products.getTokenOwner(234, nftContractAddress));
 

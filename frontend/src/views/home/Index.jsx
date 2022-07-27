@@ -1,29 +1,31 @@
 import React from 'react'
-import ProductDetails from './ProductDetails'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Card from '../../components/Card';
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 import axios from 'axios';
 import Web3Modal from 'web3modal'
-import { nftAddress, productsAddress } from "../../config";
+import { API_URL, nftAddress, productsAddress } from "../../config";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
 import Navbar from './Navbar';
 import Footer from './Footer';
 import CaptionCarousel from './Carousel';
 import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem } from '@chakra-ui/react';
-
+import { Link } from 'react-router-dom';
+import { IoMdFingerPrint } from 'react-icons/io';
+import Loader from '../../components/layout/Loader';
 
 
 export default function Index() {
   const [nfts, setNFTs] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
+
   useEffect(() => {
     loadNFTs()
   }, []);
+
   async function loadNFTs() {
-    const provider = new ethers.providers.JsonRpcBatchProvider();
+    const provider = new ethers.providers.JsonRpcBatchProvider(API_URL);
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
     const productsContract = new ethers.Contract(productsAddress, Products.abi, provider);
 
@@ -51,11 +53,12 @@ export default function Index() {
     setLoadingState('loaded');
   }
 
+  if(loadingState == 'not-loaded')
+    return <Loader />
 
   return (
     <>
       <Navbar />
-      <CaptionCarousel />
       <Container maxW={'10xl'} centerContent my={10}>
         <Box>
           <SimpleGrid columns={[1, 1, 2, 3]} spacing='40px'>
@@ -63,7 +66,9 @@ export default function Index() {
               loadingState == 'loaded' && !nfts.length ?
                 <h1 className='px-20 py-10 text-3xl '> No items in marketplace</h1>
                 : nfts.map((nft, i) => (
-                  <Card key={i} {...nft} />
+                  <Link to={`/product/${nft.itemId}`}>
+                    <Card key={i} {...nft} />
+                  </Link>
                 ))
             }
           </SimpleGrid>

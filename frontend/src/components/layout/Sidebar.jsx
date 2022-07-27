@@ -33,11 +33,9 @@ import {
 } from 'react-router-dom';
 
 const LinkItems = [
-  { name: 'Home', icon: FiHome, path: '/dashboard/' },
+  { name: 'Products Bought', icon: FiHome, path: '/dashboard/' },
   { name: 'Create Product', icon: FiTrendingUp, path: '/dashboard/create-product' },
-  { name: 'Products for Sale', icon: FiCompass, path: '/for-sale' },
-  { name: 'Products Bought', icon: FiStar, path: '/owned-products' },
-  { name: 'Settings', icon: FiSettings, path: '/settings' },
+  { name: 'Product for Sale', icon: FiCompass, path: '/for-sale' },
 ];
 
 export default function SidebarWithHeader({ children }) {
@@ -82,7 +80,9 @@ const SidebarContent = ({ onClose, ...rest }) => {
       {...rest}>
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Mintcart
+          <Link to="/">
+            MintKart
+          </Link>
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -152,7 +152,7 @@ const MobileNav = ({ onOpen, ...rest }) => {
         fontSize="2xl"
         fontFamily="monospace"
         fontWeight="bold">
-        Logo
+        MintKart
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>

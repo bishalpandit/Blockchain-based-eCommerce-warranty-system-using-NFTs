@@ -12,7 +12,8 @@ import {
     useColorModeValue,
     List,
     ListItem,
-    ChakraProvider
+    ChakraProvider,
+    useToast
 } from '@chakra-ui/react';
 import Web3Modal from 'web3modal';
 import { BigNumber, ethers } from 'ethers';
@@ -22,38 +23,47 @@ import axios from 'axios';
 
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
-import { nftAddress, productsAddress } from "../../config";
+import { API_URL, nftAddress, productsAddress } from "../../config";
 import Navbar from './Navbar';
+import Loader from '../../components/layout/Loader';
 
 
 export default function ProductDetails() {
-    const [product, setProduct] = useState(null);
     const { id } = useParams();
+    const toast = useToast();
+    const [product, setProduct] = useState(null);
 
     useEffect(() => {
         loadNFTById();
     }, []);
 
     async function loadNFTById() {
-        const provider = new ethers.providers.JsonRpcBatchProvider();
-        const productContract = new ethers.Contract(productsAddress, Products.abi, provider);
-        const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+        try {
+            const provider = new ethers.providers.JsonRpcBatchProvider(API_URL);
+            const productContract = new ethers.Contract(productsAddress, Products.abi, provider);
+            const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
 
-        const product = await productContract.getProductById(BigNumber.from(id));
-        const tokenUri = await tokenContract.tokenURI(product.tokenIds[0]);
-        const meta = (await axios.get(tokenUri)).data;
-        let price = ethers.utils.formatUnits(product.price.toString(), 'ether');
+            const product = await productContract.getProductById(BigNumber.from(id));
+            const tokenUri = await tokenContract.tokenURI(product.tokenIds[0]);
+            const meta = (await axios.get(tokenUri)).data;
+            let price = ethers.utils.formatUnits(product.price.toString(), 'ether');
 
-        const tokens = await Promise.all(product.tokenIds.map(async t => {
-            return t.toNumber();
-        }));
+            const tokens = await Promise.all(product.tokenIds.map(async t => {
+                return t.toNumber();
+            }));
 
-        setProduct({
-            ...product,
-            tokens,
-            price,
-            image: meta.image
-        });
+            setProduct({
+                ...product,
+                tokens,
+                price,
+                image: meta.image
+            });
+        } catch (error) {
+            toast({
+
+            })
+        }
+
     }
 
     async function buyNFT() {
@@ -62,19 +72,17 @@ export default function ProductDetails() {
         const provider = new ethers.providers.Web3Provider(connection);
 
         const signer = provider.getSigner();
-        const productsContract = new ethers.Contract(productsAddress, Products.abi, signer); // we to provider signer 
-        const newPrice = ethers.utils.parseUnits(price.toString(), 'ether');
-        const transaction = await contract.createMarketSale(nftAddress, tokenId, {  // call createMarketSale
-            value: newPrice
-        })
+        const contract = new ethers.Contract(productsAddress, Products.abi, signer);
+        const price = ethers.utils.parseUnits(product.price.toString(), "ether");
+        const transaction = await contract.buyProduct(id, {
+            value: price
+        });
 
-        await transaction.wait() // wait for transaction 
-        loadNFTs(); // load page as this nft should not see in page 
-
+        await transaction.wait();
     }
 
     if (!product)
-        return;
+        return <Loader />
 
     return (
         <>
@@ -145,6 +153,12 @@ export default function ProductDetails() {
                                     </ListItem>
                                     <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>
+                                            Stock units:
+                                        </Text>{' '}
+                                        {product.tokens.length} 
+                                    </ListItem>
+                                    <ListItem>
+                                        <Text as={'span'} fontWeight={'bold'}>
                                             Category:
                                         </Text>{' '}
                                         {product.category}
@@ -181,3 +195,4 @@ export default function ProductDetails() {
 
     );
 }
+

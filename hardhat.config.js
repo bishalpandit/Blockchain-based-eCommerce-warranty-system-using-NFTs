@@ -1,21 +1,22 @@
-require("@nomiclabs/hardhat-waffle");
-require('dotenv').config({path:__dirname+'/.env'})
-/** @type import('hardhat/config').HardhatUserConfig */
-const projectId = process.env.PROJECT_ID 
-const privateKey = process.env.PRIVATE_KEY
+/**
+* @type import('hardhat/config').HardhatUserConfig
+*/
+
+require('dotenv').config({ path: __dirname + '/.env' })
+require("@nomiclabs/hardhat-ethers");
+
+const { API_URL, PRIVATE_KEY } = process.env;
+
 module.exports = {
-  networks: {
-    hardhat: {
-      chainId: 1337 //config happen accordiing to hardhat documentation
-    },
-    mumbai: {
-      url: `https://rpc-mumbai.maticvigil.com/v1/${projectId}`,
-      accounts: [privateKey]
-    },
-    mainnet: {
-      url: `https://rpc-mainnet.maticvigil.com/v1/${projectId}`,
-      accounts: [privateKey]
-    }
-  },
-  solidity: "0.8.9",
-};
+   solidity: "0.8.9",
+   defaultNetwork: "goerli",
+   networks: {
+      hardhat: {
+         chainId: 5
+      },
+      goerli: {
+         url: API_URL,
+         accounts: [`0x${PRIVATE_KEY}`]
+      }
+   },
+}

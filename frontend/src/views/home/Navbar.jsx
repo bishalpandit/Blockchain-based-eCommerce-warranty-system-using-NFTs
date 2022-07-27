@@ -4,7 +4,6 @@ import {
   Flex,
   Avatar,
   HStack,
-  Link,
   IconButton,
   Button,
   Menu,
@@ -16,21 +15,15 @@ import {
   useColorModeValue,
   Stack,
 } from '@chakra-ui/react';
+import { Link } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import logo from '../../images/logo.png';
 
-const Links = [{to: '/dashboard', value: 'Dashboard'}];
+const Links = [{ to: '/dashboard', value: 'Dashboard' }];
 
 const NavLink = ({ children }) => (
   <Link
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.200', 'gray.700'),
-    }}
-    href={children.to}>
+    to={children.to}>
     {children.value}
   </Link>
 );
@@ -50,7 +43,9 @@ export default function Navbar() {
             onClick={isOpen ? onClose : onOpen}
           />
           <HStack spacing={8} alignItems={'center'}>
-            <Box><img src={logo} alt="logo" width="100px" /></Box>
+            <Link p={2} to="/">
+              <img src={logo} alt="logo" width="65px" />
+            </Link>
             <HStack
               as={'nav'}
               spacing={4}
@@ -84,10 +79,9 @@ export default function Navbar() {
                 />
               </MenuButton>
               <MenuList>
-                <MenuItem>Link 1</MenuItem>
-                <MenuItem>Link 2</MenuItem>
-                <MenuDivider />
-                <MenuItem>Link 3</MenuItem>
+                <MenuItem>Your Product for Sale</MenuItem>
+                <MenuItem>Transfer Ownership</MenuItem>
+                <MenuItem>Create your Product</MenuItem>
               </MenuList>
             </Menu>
           </Flex>

@@ -17,7 +17,7 @@ describe('Products', () => {
 
     const [_, buyerAddress, thirdPerson] = await ethers.getSigners();
 
-    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 12, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com", { value: "4" });
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 6, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com", { value: "4" });
 
     console.log("Current Token owner: " + await products.getTokenOwner(234, nftContractAddress));
 

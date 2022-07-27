@@ -63,7 +63,7 @@ function Main() {
       <Grid templateColumns='repeat(5, 1fr)' gap={6}>
         {
           nfts.map((nft, i) =>
-            <GridItem w='100%' h='10' bg='blue.500'>
+            <GridItem key={i} w='100%' h='10' bg='blue.500'>
               <Card {...nft} />
             </GridItem>
           )

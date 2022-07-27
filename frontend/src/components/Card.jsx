@@ -7,7 +7,21 @@ import {
   useColorModeValue,
   Icon,
   chakra,
-  Tooltip
+  Tooltip,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverFooter,
+  PopoverArrow,
+  PopoverCloseButton,
+  PopoverAnchor,
+  Portal,
+  Button,
+  Input,
+  Stack,
+  HStack
 } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
@@ -18,6 +32,7 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import { nftAddress, productsAddress } from "../config";
 import { MdContentCopy } from "react-icons/md";
+import { IoMdSend } from "react-icons/io"
 
 import NFT from "../../../artifacts/contracts/NFT.sol/NFT.json";
 import Products from "../../../artifacts/contracts/Products.sol/Products.json";
@@ -58,22 +73,22 @@ function Rating({ rating, numReviews }) {
   );
 }
 
-function Card({ itemId, image, title, price, description, tokenIds }) {
+function Card({ itemId, image, title, price, description, tokenIds, owner }) {
 
   // buying nft
   async function buyNFT(itemId, price) {
-    const web3Modal = new Web3Modal(); 
-    const connection = await web3Modal.connect(); 
-    const provider = new ethers.providers.Web3Provider(connection); 
+    const web3Modal = new Web3Modal();
+    const connection = await web3Modal.connect();
+    const provider = new ethers.providers.Web3Provider(connection);
 
-    const signer = provider.getSigner(); 
-    const contract = new ethers.Contract(productsAddress, Products.abi, signer); 
+    const signer = provider.getSigner();
+    const contract = new ethers.Contract(productsAddress, Products.abi, signer);
     const newPrice = ethers.utils.parseUnits(price.toString(), "ether");
-    const transaction = await contract.sellProduct(itemId, {
+    const transaction = await contract.buyProduct(itemId, {
       value: newPrice
     });
 
-    await transaction.wait(); 
+    await transaction.wait();
   }
 
   return (
@@ -89,11 +104,14 @@ function Card({ itemId, image, title, price, description, tokenIds }) {
 
       <Box p="6">
         <Box d="flex" alignItems="baseline">
-            <Badge rounded="full" px="2" fontSize="0.8em">
-              <Box >
-                <MdContentCopy /> {tokenIds.length}
-              </Box>
-            </Badge>
+          <Badge rounded="full" px="2" fontSize="0.8em">
+            <HStack spacing={2}>
+              <MdContentCopy />
+              <Text>
+                {tokenIds.length}
+              </Text>
+            </HStack>
+          </Badge>
         </Box>
         <Box d="flex" alignItems="baseline" />
         <Flex mt="1" justifyContent="space-between" alignContent="center">
@@ -101,37 +119,48 @@ function Card({ itemId, image, title, price, description, tokenIds }) {
             {title}
           </Box>
           <Tooltip
-            label="Add to cart"
+            label={parseInt(owner) == 0 ? "Buy" : "Transfer Product"}
             bg="white"
             placement={"top"}
             color={"gray.800"}
             fontSize={"1.2em"}
           >
             <chakra.a href={"#"} display={"flex"}>
-              <Icon
-                as={FiShoppingCart}
-                h={7}
-                w={7}
-                alignSelf={"center"}
-                onClick={() => buyNFT(itemId, price)}
-              />
+              <Popover>
+                <PopoverTrigger>
+                  <Icon
+                    as={parseInt(owner) == 0 ? FiShoppingCart : IoMdSend}
+                    h={7}
+                    w={7}
+                    alignSelf={"center"}
+                    onClick={parseInt(owner) == 0 ? () => buyNFT(itemId, price) : null}
+                  />
+                </PopoverTrigger>
+                <PopoverContent>
+                  <PopoverArrow />
+                  <PopoverHeader>Transfer Product</PopoverHeader>
+                  <PopoverCloseButton />
+                  <PopoverBody>
+                    <Stack spacing={2}>
+                      <Input placeholder="Reciever's Address" />
+                      <Button colorScheme='blue'>Transfer</Button>
+                    </Stack>
+                  </PopoverBody>
+                </PopoverContent>
+              </Popover>
             </chakra.a>
           </Tooltip>
         </Flex>
-        <Text fontSize="xl">
-          {description}
-        </Text>
         <Flex justifyContent="space-between" alignContent="center">
-          {/* <Rating rating={5} numReviews={22} style={{display: 'flex'}}/> */}
           <Box fontSize="2xl" color={useColorModeValue("gray.800", "white")}>
-            <Box as="span" color={"gray.600"} fontSize="lg">
-              ₹
+            <Box as="span" p={2} color={"gray.600"} fontSize="lg">
+              ETH
             </Box>
             {price}
           </Box>
         </Flex>
       </Box>
-    </Box>
+    </Box >
   );
 }
 

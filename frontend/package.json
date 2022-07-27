@@ -8,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@alch/alchemy-sdk": "^1.2.0",
     "@chakra-ui/icons": "^2.0.4",
     "@chakra-ui/react": "^2.2.4",
     "@emotion/react": "^11.9.3",
@@ -26,6 +27,7 @@
     "react-router-dom": "6",
     "react-slick": "^0.29.0",
     "use-file-upload": "^1.0.11",
+    "web3": "^1.7.4",
     "web3modal": "^1.9.8"
   },
   "devDependencies": {

@@ -32,6 +32,7 @@ contract Products is ReentrancyGuard {
         address payable seller;
         address payable owner;
     }
+    event Transfer(address indexed from, address indexed to, uint256 indexed tokenId);
 
     mapping(uint256 => Product) private idToProduct;
 
@@ -118,6 +119,8 @@ contract Products is ReentrancyGuard {
         );
         
         idToProduct[newItemId] = newProduct;
+        emit Transfer(product.seller, msg.sender, lastTokenId);
+
     }
 
     function generateTokens(
@@ -224,6 +227,7 @@ contract Products is ReentrancyGuard {
         NFT(nftContract).transferNFT(payable(msg.sender), receiver, lastTokenId);
 
         idToProduct[itemId].owner = receiver;
+         emit Transfer(msg.sender, receiver, lastTokenId);
     }
 
     function burnToken(uint256 tokenId) public {

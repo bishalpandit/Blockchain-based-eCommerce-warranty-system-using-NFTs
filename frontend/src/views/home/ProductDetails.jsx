@@ -67,18 +67,39 @@ export default function ProductDetails() {
     }
 
     async function buyNFT() {
-        const web3Modal = new Web3Modal();
-        const connection = await web3Modal.connect();
-        const provider = new ethers.providers.Web3Provider(connection);
+        try {
+            const web3Modal = new Web3Modal();
+            const connection = await web3Modal.connect();
+            const provider = new ethers.providers.Web3Provider(connection);
 
-        const signer = provider.getSigner();
-        const contract = new ethers.Contract(productsAddress, Products.abi, signer);
-        const price = ethers.utils.parseUnits(product.price.toString(), "ether");
-        const transaction = await contract.buyProduct(id, {
-            value: price
-        });
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(productsAddress, Products.abi, signer);
+            const price = ethers.utils.parseUnits(product.price.toString(), "ether");
+            const transaction = await contract.buyProduct(id, {
+                value: price
+            });
 
-        await transaction.wait();
+            await transaction.wait();
+
+            toast({
+                title: "Success",
+                description: "Product purchased",
+                status: "success",
+                duration: 5000,
+                isClosable: true,
+                position: "top",
+            });
+        } catch (err) {
+            toast({
+                title: "Failure",
+                description: "Error occured. Check console for more info",
+                status: "error",
+                duration: 5000,
+                isClosable: true,
+                position: "top",
+            });
+        }
+
     }
 
     if (!product)
@@ -155,7 +176,7 @@ export default function ProductDetails() {
                                         <Text as={'span'} fontWeight={'bold'}>
                                             Stock units:
                                         </Text>{' '}
-                                        {product.tokens.length} 
+                                        {product.tokens.length}
                                     </ListItem>
                                     <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>

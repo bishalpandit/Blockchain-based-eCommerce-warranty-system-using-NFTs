@@ -21,7 +21,8 @@ import {
   Button,
   Input,
   Stack,
-  HStack
+  HStack,
+  useToast
 } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
@@ -30,7 +31,7 @@ import { ethers } from "ethers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Web3Modal from "web3modal";
-import { nftAddress, productsAddress } from "../config";
+import { API_URL, nftAddress, productsAddress } from "../config";
 import { MdContentCopy } from "react-icons/md";
 import { IoMdSend } from "react-icons/io"
 
@@ -74,21 +75,94 @@ function Rating({ rating, numReviews }) {
 }
 
 function Card({ itemId, image, title, price, description, tokenIds, owner }) {
+  const toast = useToast();
+  const [receiverAddress, setReceiverAddress] = useState('');
+
+  console.log(itemId);
 
   // buying nft
   async function buyNFT(itemId, price) {
-    const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect();
-    const provider = new ethers.providers.Web3Provider(connection);
 
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(productsAddress, Products.abi, signer);
-    const newPrice = ethers.utils.parseUnits(price.toString(), "ether");
-    const transaction = await contract.buyProduct(itemId, {
-      value: newPrice
-    });
+    try {
+      const web3Modal = new Web3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
 
-    await transaction.wait();
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(productsAddress, Products.abi, signer);
+      const newPrice = ethers.utils.parseUnits(price.toString(), "ether");
+      const transaction = await contract.buyProduct(itemId, {
+        value: newPrice
+      });
+
+      await transaction.wait();
+
+      toast({
+        title: "Success",
+        description: `${title} purchased`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    } catch (err) {
+      toast({
+        title: "Failure",
+        description: err,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+
+  }
+
+  async function transferProduct() {
+
+    try {
+      const web3Modal = new Web3Modal();
+      const connection = await web3Modal.connect();
+      const provider = new ethers.providers.Web3Provider(connection);
+
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(productsAddress, Products.abi, signer);
+      const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+      console.log('hi');
+      
+      // await tokenContract.giveOwnershipToContract();
+      const transaction = await contract.transferProduct(itemId, '0x90F79bf6EB2c4f870365E785982E1f101E93b906')
+
+      await transaction.wait();
+      console.log(transaction + 'hi');
+
+      toast({
+        title: "Success",
+        description: `${title} transferred`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    } catch (err) {
+      toast({
+        title: "Failure",
+        description: "Error occured. Check console for more info.",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+  }
+
+  async function getOwner() {
+    const provider = new ethers.providers.JsonRpcBatchProvider(API_URL);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+    const productsContract = new ethers.Contract(productsAddress, Products.abi, provider);
+
+    const data = await productsContract.getTokenOwner(1234, nftAddress);
+    console.log(data);
   }
 
   return (
@@ -142,8 +216,8 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
                   <PopoverCloseButton />
                   <PopoverBody>
                     <Stack spacing={2}>
-                      <Input placeholder="Reciever's Address" />
-                      <Button colorScheme='blue'>Transfer</Button>
+                      <Input onChange={(e) => setReceiverAddress(e.target.value)} placeholder="Reciever's Address" />
+                      <Button onClick={transferProduct}  colorScheme='blue'>Transfer</Button>
                     </Stack>
                   </PopoverBody>
                 </PopoverContent>

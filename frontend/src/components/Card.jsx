@@ -21,7 +21,15 @@ import {
   Button,
   Input,
   Stack,
-  HStack
+  HStack,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  ModalContent
 } from "@chakra-ui/react";
 import { Text } from "@chakra-ui/react";
 import { BsStar, BsStarFill, BsStarHalf } from "react-icons/bs";
@@ -32,7 +40,8 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import { nftAddress, productsAddress } from "../config";
 import { MdContentCopy } from "react-icons/md";
-import { IoMdSend } from "react-icons/io"
+import { IoMdSend } from "react-icons/io";
+import { FiSend } from "react-icons/fi";
 
 import NFT from "../../../artifacts/contracts/NFT.sol/NFT.json";
 import Products from "../../../artifacts/contracts/Products.sol/Products.json";
@@ -74,7 +83,7 @@ function Rating({ rating, numReviews }) {
 }
 
 function Card({ itemId, image, title, price, description, tokenIds, owner }) {
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   // buying nft
   async function buyNFT(itemId, price) {
     const web3Modal = new Web3Modal();
@@ -94,13 +103,22 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
   return (
     <Box
       bg={useColorModeValue("white", "gray.800")}
-      maxW="sm"
+      w="300px"
+      h="450px"
       borderWidth="1px"
       rounded="lg"
       shadow="lg"
       position="relative"
     >
-      <Image src={image} alt={`Picture of ${title}`} roundedTop="lg" />
+      <Box w="100%" h="270px">
+        <Image
+          src={image}
+          alt={`Picture of ${title}`}
+          roundedTop="lg"
+          p={4}
+          borderRadius="base"
+        />
+      </Box>
 
       <Box p="6">
         <Box d="flex" alignItems="baseline">
@@ -126,7 +144,47 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
             fontSize={"1.2em"}
           >
             <chakra.a href={"#"} display={"flex"}>
-              <Popover>
+              <Button onClick={onOpen}>
+                <Icon
+                  as={parseInt(owner) == 0 ? FiShoppingCart : FiSend}
+                  h={7}
+                  w={7}
+                  alignSelf={"center"}
+                  onClick={
+                    parseInt(owner) == 0 ? () => buyNFT(itemId, price) : null
+                  }
+                />
+              </Button>
+              <Modal
+                blockScrollOnMount={false}
+                isOpen={isOpen}
+                onClose={onClose}
+                isCentered
+              >
+                <ModalOverlay
+                  bg="blackAlpha.300"
+                  backdropFilter="blur(10px) hue-rotate(90deg)"
+                />
+                <ModalContent>
+                  <ModalHeader>
+                    Transfer {title}
+                  </ModalHeader>
+                  <ModalCloseButton />
+                  <ModalBody>
+                    <Stack spacing={2}>
+                      <Input placeholder="Reciever's Address" />
+                    </Stack>
+                  </ModalBody>
+
+                  <ModalFooter>
+                    <Button colorScheme="blue" mr={3} onClick={onClose}>
+                      Transfer
+                    </Button>
+                    <Button variant="ghost">Cancel</Button>
+                  </ModalFooter>
+                </ModalContent>
+              </Modal>
+              {/* <Popover>
                 <PopoverTrigger>
                   <Icon
                     as={parseInt(owner) == 0 ? FiShoppingCart : IoMdSend}
@@ -147,20 +205,21 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
                     </Stack>
                   </PopoverBody>
                 </PopoverContent>
-              </Popover>
+              </Popover> */}
             </chakra.a>
           </Tooltip>
         </Flex>
         <Flex justifyContent="space-between" alignContent="center">
           <Box fontSize="2xl" color={useColorModeValue("gray.800", "white")}>
-            <Box as="span" p={2} color={"gray.600"} fontSize="lg">
-              ETH
+            <Box as="span" py={2} color={"gray.600"} fontSize="lg">
+              {parseInt(owner) == 0
+                ? price + "ETH"
+                : price + "ETH | months left"}
             </Box>
-            {price}
           </Box>
         </Flex>
       </Box>
-    </Box >
+    </Box>
   );
 }
 

@@ -1,5 +1,5 @@
 
-    const { initializeAlchemy, getAssetTransfers } = require('@alch/alchemy-sdk');
+const { initializeAlchemy, getAssetTransfers } = require('@alch/alchemy-sdk');
 const web3 = require('web3')
 
 // Alchemy app API key
@@ -13,18 +13,17 @@ const alchemy = initializeAlchemy(settings);
 const main = async () => {
     
     // Contract address
-    const address = ['0xb38BA0Ea0Eb7B7899E5F8CcA9b35827c7931C102']
+    const address = ['0xaE16f167ecf93b2c729952D2c03c8141137aB945']
 
     // Get all NFTs
     const response = await getAssetTransfers(alchemy, {
         fromBlock: "0x0",
         contractAddresses: address,
-        category: ["erc721"],
-        excludeZeroValue: false
+        category: ["erc721"]
     });
 
     // Set NFT ID
-    const nftId = "1111";
+    const nftId = 875;
 
     // Get transactions for the NFT
     txns = response['transfers'].filter(txn => web3.utils.hexToNumber(txn['erc721TokenId']) === nftId)

@@ -48,7 +48,6 @@ export default function Index() {
       }
       return item;
     }))
-
     setNFTs(items)
     setLoadingState('loaded');
   }

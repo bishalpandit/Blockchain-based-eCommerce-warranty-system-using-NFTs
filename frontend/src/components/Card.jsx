@@ -110,12 +110,11 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
       shadow="lg"
       position="relative"
     >
-      <Box w="100%" h="270px">
+      <Box w="100%" h="270px" style={{display: 'flex', alignItems: 'center'}}>
         <Image
           src={image}
           alt={`Picture of ${title}`}
           roundedTop="lg"
-          p={4}
           borderRadius="base"
         />
       </Box>

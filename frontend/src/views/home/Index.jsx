@@ -10,13 +10,9 @@ import Products from '../../../../artifacts/contracts/Products.sol/Products.json
 import Navbar from './Navbar';
 import Hero from './Hero';
 import Footer from './Footer';
-import CaptionCarousel from './Carousel';
-import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem, Text } from '@chakra-ui/react';
-
-import { Link } from 'react-router-dom';
-import { IoMdFingerPrint } from 'react-icons/io';
+import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem, Text, Heading } from '@chakra-ui/react';
 import Loader from '../../components/layout/Loader';
-
+import { Link } from 'react-router-dom';
 
 export default function Index() {
   const [nfts, setNFTs] = useState([]);
@@ -50,7 +46,6 @@ export default function Index() {
       }
       return item;
     }))
-
     setNFTs(items)
     setLoadingState('loaded');
   }
@@ -62,29 +57,18 @@ export default function Index() {
     <>
       <Navbar />
       <Hero />
-      {/* <Text
-              as={"span"}
-              position={"relative"}
-              _after={{
-                content: "''",
-                width: "full",
-                height: useBreakpointValue({ base: "20%", md: "30%" }),
-                position: "absolute",
-                bottom: 1,
-                left: 0,
-                bg: "blue.400",
-                zIndex: -1
-              }}
-            >
-              Spotlight.
-            </Text>
-            <br />{" "}
-            <Text color={"blue.400"} as={"span"}>
-            Products you'll love{" "}
-            </Text>{" "} */}
-            <Text color={"blue.400"} as={"span"}>
-            Products you'll love{" "}
-            </Text>
+      <Container maxW={'8xl'} pt={5}>
+      <Heading fontSize={{ base: "xl", md: "2xl", lg: "3xl" }}>
+        <Text
+          color={"blue.400"} as={"span"}
+        >
+          Spotlight.{" "}
+        </Text>
+        <Text as={"span"}>
+          Products you'll love{" "}
+        </Text>{" "}
+      </Heading>
+      </Container>
       <Container maxW={'10xl'} centerContent my={10}>
         <Box>
           <SimpleGrid columns={[1, 1, 2, 3]} spacing='40px'>

@@ -88,7 +88,6 @@ export default function CreateProduct() {
       price,
       warranty,
       serials,
-      nftAddress,
       tokenURI,
     );
 

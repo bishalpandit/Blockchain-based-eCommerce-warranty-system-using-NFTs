@@ -23,7 +23,7 @@ function Main() {
 
   async function loadNFTs() {
     const web3Modal = new Web3Modal();
-    const connection = await web3Modal.connect()
+    const connection = await Web3Modal.connect()
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner()
 
@@ -48,6 +48,8 @@ function Main() {
         image: meta.data.image,
         title: meta.data.title,
         description: meta.data.description,
+        warrantyPeriod: i.warrantyPeriod,
+        warrantyEndDate: new Date(i.warrantyEndDate.toNumber() * 1000)
       }
       return item;
 
@@ -60,7 +62,7 @@ function Main() {
 
   return (
     <Box>
-      <Grid templateColumns='repeat(5, 1fr)' gap={6}>
+      <Grid padding={4} templateColumns='repeat(5, 1fr)' gap={6}>
         {
           nfts.map((nft, i) =>
             <GridItem key={i} w='100%' h='10'>

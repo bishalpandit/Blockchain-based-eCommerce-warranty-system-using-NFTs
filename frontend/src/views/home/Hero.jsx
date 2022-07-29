@@ -5,14 +5,15 @@ import {
   Image,
   Stack,
   Text,
-  useBreakpointValue
+  useBreakpointValue,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 import heroImg from "../../images/hero.png";
 
 export default function Hero() {
   return (
-    <Stack minH={"100vh"} direction={{ base: "column", md: "row" }}>
+    <Stack minH={"100vh"} direction={{ base: "column", md: "row" }} bg={useColorModeValue('gray.100', 'gray.900')}>
       <Flex p={8} flex={1} align={"center"} justify={"center"}>
         <Stack spacing={6} w={"full"} maxW={"lg"}>
           <Heading fontSize={{ base: "3xl", md: "4xl", lg: "5xl" }}>

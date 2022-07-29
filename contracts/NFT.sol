@@ -8,10 +8,9 @@ import "@openzeppelin/contracts/utils/Counters.sol";
 
 contract NFT is ERC721URIStorage {
     using Counters for Counters.Counter; 
-    //Counters.Counter private _tokenIds; 
     address contractAddress; 
 
-    constructor(address ProductsAddress) ERC721("Metaverse Tokens", "MeTT") {
+    constructor(address ProductsAddress) ERC721("NFT Tokens", "NFT") {
         contractAddress = ProductsAddress;
     }
 
@@ -19,7 +18,6 @@ contract NFT is ERC721URIStorage {
         uint256 tokenId = serialNo;
         _mint(msg.sender, tokenId);
         _setTokenURI(tokenId, tokenURI);
-        //setApprovalForAll(contractAddress, true);
         return tokenId;
     }
 
@@ -29,7 +27,14 @@ contract NFT is ERC721URIStorage {
 
      function giveOwnershipToContract() external   {
          setApprovalForAll(contractAddress, true);
-         
+    }
+    
+    function transferNFT(address payable sender, address payable receiver, uint256 tokenId) external {
+        _transfer(sender, receiver, tokenId);
+    }
+
+    function burnToken(uint256 tokenId) external {
+        _burn(tokenId);
     }
 
 } 

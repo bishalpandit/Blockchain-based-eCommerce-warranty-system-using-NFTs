@@ -11,31 +11,35 @@ describe('Products', () => {
     const nft = await NFT.deploy(productsAddress);
     await nft.deployed();
     const nftContractAddress = nft.address;
+
+    await products.setNFTContract(nftContractAddress);
+
     console.log("Product address", productsAddress);
     console.log("NFT address", nftContractAddress);
     const auctionPrice = ethers.utils.parseUnits('100', 'ether');
 
     const [_, buyerAddress, thirdPerson] = await ethers.getSigners();
 
-    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 6, [123, 234], nftContractAddress, "https://www.mytokenlocation2.com", { value: "4" });
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 0, [123, 234], "https://www.mytokenlocation2.com", { value: "4" });
 
-    console.log("Current Token owner: " + await products.getTokenOwner(234, nftContractAddress));
+    console.log("Current Token owner: " + await products.getTokenOwner(234));
 
     console.log(await products.getProducts());
    
     await products.connect(buyerAddress).buyProduct(1, { value: auctionPrice });
 
-    console.log("Current Token owner: " + await products.getTokenOwner(234, nftContractAddress));
+    console.log("Current Token owner: " + await products.getTokenOwner(234));
 
     console.log(await products.getProducts());
     console.log(await products.connect(buyerAddress).getMyProducts());
 
-    await nft.connect(buyerAddress).giveOwnershipToContract()
+   // await nft.connect(buyerAddress).giveOwnershipToContract()
     await products.connect(buyerAddress).transferProduct(2, "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC");
 
-    console.log("Current Token owner: " + await products.getTokenOwner(234, nftContractAddress));
+    console.log("Current Token owner: " + await products.getTokenOwner(234));
+    await products.connect(thirdPerson).validateWarranty();
     console.log(await products.connect(thirdPerson).getMyProducts());
-
+    //console.log("Current Token owner: " + await products.getTokenOwner(234));
   });
  });
  

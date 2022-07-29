@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import {
   Box,
   Flex,
@@ -14,10 +14,16 @@ import {
   useDisclosure,
   useColorModeValue,
   Stack,
+  Badge,
+  useToast,
+  Icon,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import logo from '../../images/logo.png';
+import { useEffect } from 'react';
+import web3Modal from 'web3modal'
+import { ethers } from "ethers";
 
 const Links = [{ to: '/dashboard', value: 'Dashboard' }];
 
@@ -28,25 +34,67 @@ const NavLink = ({ children }) => (
   </Link>
 );
 
+const CircleIcon = (props) => (
+  <Icon viewBox='0 0 200 200' {...props}>
+    <path
+      fill='currentColor'
+      d='M 100, 100 m -75, 0 a 75,75 0 1,0 150,0 a 75,75 0 1,0 -150,0'
+    />
+  </Icon>
+)
+
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [account, setAccount] = useState('0x00000000000')
+  const toast = useToast();
 
   async function getAccount() {
     // const accounts = await windows.ethereum.request({ method: 'eth_requestAccounts' });
     // const account = accounts[0];
     // showAccount.innerHTML = account;
     if (typeof window.ethereum !== 'undefined') {
-      console.log(window.ethereum.request({ method: 'eth_requestAccounts' }));
+      // const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      // console.log(acc)
+      const provider = new ethers.providers.Web3Provider(window.ethereum)
+      const acc = await provider.send("eth_requestAccounts", []);
+      const signer = provider.getSigner()
+      console.log(acc[0])
+      setAccount(acc[0])
+      console.log(account)
+      toast({
+        title: "Metamask Connected",
+        description: `Address : ${account}`,
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+    });
     } else {
-      alert("Install metamask")
+      toast({
+        title: "Metamask Not Found",
+        description: "Instal Metamask",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "top",
+    });
     }
   }
 
   window.ethereum.on('chainChanged', (chainId) => {
-    // Handle the new chain.
-    // Correctly handling chain changes can be complicated.
-    // We recommend reloading the page unless you have good reason not to.
     window.location.reload();
+  });
+
+  window.ethereum.on('accountsChanged', (accounts) => {
+    setAccount(accounts[0])
+    toast({
+      title: "Account Changed",
+      description: `Address :${account}`,
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+      position: "top",
+    });
   });
 
   return (
@@ -79,10 +127,10 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={<AddIcon />}
+              leftIcon={account === '' ? <AddIcon />: <CircleIcon boxSize={4} />}
               onClick={getAccount}
               >
-              Connect to wallet
+              {account === '' ? "Connect to wallet" : "Connected"}
             </Button>
             <Menu>
               <MenuButton
@@ -99,6 +147,8 @@ export default function Navbar() {
                 />
               </MenuButton>
               <MenuList>
+                <Badge colorScheme='twitter' variant='outline'>Address: {account}</Badge>
+                <br />{" "}
                 <MenuItem>Your Product for Sale</MenuItem>
                 <MenuItem>Transfer Ownership</MenuItem>
                 <MenuItem>Create your Product</MenuItem>

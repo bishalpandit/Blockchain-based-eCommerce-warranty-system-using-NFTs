@@ -1,4 +1,4 @@
-import axios from 'axios';
+const axios = require("axios");
 
   let data = JSON.stringify({
   "jsonrpc": "2.0",
@@ -7,7 +7,8 @@ import axios from 'axios';
   "params": [
     {
       "fromBlock": "0x0",
-      "fromAddress": "0x5c43B1eD97e52d009611D89b74fA829FE4ac56b1",
+      "fromAddress": "0xE2Ecc423A7dD603984ef26523986528037E7fF9a",
+      "category": ["erc721"]
     }
   ]
 });
@@ -18,8 +19,8 @@ import axios from 'axios';
     data: data,
   };
 
-  const apiKey = "demo"
-  const baseURL = `https://eth-mainnet.alchemyapi.io/v2/${apiKey}`;
+  const apiKey = "u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX"
+  const baseURL = `https://eth-goerli.g.alchemy.com/v2/u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX`;
   const axiosURL = `${baseURL}`;
 
   axios(axiosURL, requestOptions)

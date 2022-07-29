@@ -13,6 +13,7 @@ contract Products is ReentrancyGuard {
     Counters.Counter private _itemIds;
 
     address payable owner;
+    address nftContract;
 
     constructor() {
         owner = payable(msg.sender);
@@ -30,10 +31,19 @@ contract Products is ReentrancyGuard {
         uint256[] tokenIds;
         address payable seller;
         address payable owner;
-        address nftContract;
+        bool warrantyExpired;
     }
+    event Transfer(
+        address indexed from,
+        address indexed to,
+        uint256 indexed tokenId
+    );
 
     mapping(uint256 => Product) private idToProduct;
+
+    function setNFTContract(address nftAddress) public {
+        nftContract = nftAddress;
+    }
 
     function createProduct(
         string memory title,
@@ -43,7 +53,6 @@ contract Products is ReentrancyGuard {
         uint256 price,
         uint8 warrantyPeriod,
         uint256[] memory serialNos,
-        address nftAddress,
         string memory tokenURI
     ) public payable nonReentrant {
         require(price > 0, "Price must be at least 1 wei");
@@ -60,10 +69,10 @@ contract Products is ReentrancyGuard {
             price,
             warrantyPeriod,
             0,
-            generateTokens(nftAddress, tokenURI, serialNos),
+            generateTokens(tokenURI, serialNos),
             payable(msg.sender),
             payable(address(0)),
-            nftAddress
+            false
         );
     }
 
@@ -75,10 +84,7 @@ contract Products is ReentrancyGuard {
             msg.value == price,
             "Please pay the entire price in order to purchase the product"
         );
-        require(
-            product.tokenIds.length > 0,
-            "Product out of stock"
-        );
+        require(product.tokenIds.length > 0, "Product out of stock");
         require(
             msg.sender != product.seller,
             "Seller cannot buy their own product"
@@ -90,9 +96,10 @@ contract Products is ReentrancyGuard {
         uint256[] memory buyerTokens = new uint256[](1);
         buyerTokens[0] = lastTokenId;
 
-        uint256 warrantyEndDate = block.timestamp + (uint256(product.warrantyPeriod) * 30 * 24 * 60 * 60);
+        uint256 warrantyEndDate = block.timestamp +
+            (uint256(product.warrantyPeriod) * 30 * 24 * 60 * 60);
 
-        IERC721(product.nftContract).transferFrom(
+        IERC721(nftContract).transferFrom(
             address(this),
             msg.sender,
             lastTokenId
@@ -113,21 +120,21 @@ contract Products is ReentrancyGuard {
             buyerTokens,
             payable(product.seller),
             payable(msg.sender),
-            product.nftContract
+            false
         );
-        
+
         idToProduct[newItemId] = newProduct;
+        emit Transfer(product.seller, msg.sender, lastTokenId);
     }
 
-    function generateTokens(
-        address nftAddress,
-        string memory tokenURI,
-        uint256[] memory serialNos
-    ) private returns (uint256[] memory) {
+    function generateTokens(string memory tokenURI, uint256[] memory serialNos)
+        private
+        returns (uint256[] memory)
+    {
         uint256[] memory tokens = new uint256[](serialNos.length);
 
         for (uint8 i = 0; i < serialNos.length; i++) {
-            tokens[i] = NFT(nftAddress).createToken(tokenURI, serialNos[i]);
+            tokens[i] = NFT(nftContract).createToken(tokenURI, serialNos[i]);
         }
 
         return tokens;
@@ -137,8 +144,8 @@ contract Products is ReentrancyGuard {
         uint256 itemsCount = _itemIds.current();
         uint256 unsoldItemsCount = 0;
 
-        for(uint256 i=1; i<=itemsCount; i++) {
-            if(idToProduct[i].owner == address(0)) {
+        for (uint256 i = 1; i <= itemsCount; i++) {
+            if (idToProduct[i].owner == address(0)) {
                 unsoldItemsCount++;
             }
         }
@@ -146,7 +153,7 @@ contract Products is ReentrancyGuard {
 
         uint256 index = 0;
         for (uint256 i = 1; i <= itemsCount; i++) {
-            if(idToProduct[i].owner == address(0)) {
+            if (idToProduct[i].owner == address(0)) {
                 items[index] = idToProduct[i];
                 index++;
             }
@@ -155,7 +162,11 @@ contract Products is ReentrancyGuard {
         return items;
     }
 
-    function getProductById(uint256 itemId) public view returns (Product memory) {
+    function getProductById(uint256 itemId)
+        public
+        view
+        returns (Product memory)
+    {
         uint256 itemsCount = _itemIds.current();
         require(itemsCount >= itemId, "Invalid itemd id");
         return idToProduct[itemId];
@@ -186,16 +197,23 @@ contract Products is ReentrancyGuard {
         return myProducts;
     }
 
-    function getTokenOwner(uint256 tokenId, address nftContract)
-        public
-        view
-        returns (address)
-    {
-        return NFT(nftContract).getTokenOwner(tokenId);
+    function validateWarranty() public {
+        uint256 currentTime = block.timestamp;
+
+        for (uint256 i = 0; i < _itemIds.current(); i++) {
+            if (
+                msg.sender == idToProduct[i + 1].owner &&
+                currentTime > idToProduct[i + 1].warrantyEndDate
+            ) {
+                uint256 token = idToProduct[i + 1].tokenIds[0];
+                this.burnToken(token);
+                idToProduct[i + 1].warrantyExpired = true;
+            }
+        }
     }
 
-    function getBuyerAddress() public view returns (address) {
-        return msg.sender;
+    function getTokenOwner(uint256 tokenId) public view returns (address) {
+        return NFT(nftContract).getTokenOwner(tokenId);
     }
 
     function getLastToken(uint256 itemId) public view returns (uint256) {
@@ -203,24 +221,38 @@ contract Products is ReentrancyGuard {
             idToProduct[itemId].tokenIds.length - 1
         ];
         return lastTokenId;
-    } 
+    }
 
-    function transferProduct(uint256 itemId, address payable receiver) public payable nonReentrant {
+    function transferProduct(uint256 itemId, address payable receiver)
+        public
+        payable
+        nonReentrant
+    {
         Product storage product = idToProduct[itemId];
         require(
-            msg.sender == product.owner && 
-            msg.sender == NFT(product.nftContract).getTokenOwner(product.tokenIds[0]),
-            "You are not the owner or seller of this product"
+            msg.sender == product.owner &&
+                msg.sender ==
+                NFT(nftContract).getTokenOwner(product.tokenIds[0]),
+            "You are not the owner of this product"
         );
-       
+
         uint256 lastTokenId = product.tokenIds[product.tokenIds.length - 1];
 
-        IERC721(product.nftContract).transferFrom(
-            msg.sender,
+        NFT(nftContract).transferNFT(
+            payable(msg.sender),
             receiver,
             lastTokenId
         );
 
         idToProduct[itemId].owner = receiver;
+        emit Transfer(msg.sender, receiver, lastTokenId);
+    }
+
+    function burnToken(uint256 tokenId) public {
+        require(
+            msg.sender == NFT(nftContract).getTokenOwner(tokenId),
+            "Only token owner can burn the token."
+        );
+        NFT(nftContract).burnToken(tokenId);
     }
 }

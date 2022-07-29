@@ -52,8 +52,7 @@ contract Products is ReentrancyGuard {
         string memory category,
         uint256 price,
         uint8 warrantyPeriod,
-        uint256[] memory serialNos,
-        string memory tokenURI
+        uint256[] memory serialNos
     ) public payable nonReentrant {
         require(price > 0, "Price must be at least 1 wei");
 
@@ -69,11 +68,19 @@ contract Products is ReentrancyGuard {
             price,
             warrantyPeriod,
             0,
-            generateTokens(tokenURI, serialNos),
+            serialNos,
             payable(msg.sender),
             payable(address(0)),
             false
         );
+
+        for (uint8 i = 0; i < serialNos.length; i++) {
+            IERC721(nftContract).transferFrom(
+                msg.sender,
+                address(this),
+                serialNos[i]
+            );
+        }
     }
 
     function buyProduct(uint256 itemId) public payable nonReentrant {
@@ -125,19 +132,6 @@ contract Products is ReentrancyGuard {
 
         idToProduct[newItemId] = newProduct;
         emit Transfer(product.seller, msg.sender, lastTokenId);
-    }
-
-    function generateTokens(string memory tokenURI, uint256[] memory serialNos)
-        private
-        returns (uint256[] memory)
-    {
-        uint256[] memory tokens = new uint256[](serialNos.length);
-
-        for (uint8 i = 0; i < serialNos.length; i++) {
-            tokens[i] = NFT(nftContract).createToken(tokenURI, serialNos[i]);
-        }
-
-        return tokens;
     }
 
     function getProducts() public view returns (Product[] memory) {
@@ -206,7 +200,7 @@ contract Products is ReentrancyGuard {
                 currentTime > idToProduct[i + 1].warrantyEndDate
             ) {
                 uint256 token = idToProduct[i + 1].tokenIds[0];
-                this.burnToken(token);
+                burnToken(token);
                 idToProduct[i + 1].warrantyExpired = true;
             }
         }

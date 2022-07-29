@@ -22,7 +22,7 @@ import { ethers } from 'ethers';
 import { useForm } from "react-hook-form";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
-import { nftAddress, productsAddress } from "../../config";
+import { API_URL, nftAddress, productsAddress } from "../../config";
 import axios from 'axios'
 
 const baseDataURL = `https://ipfs.infura.io/ipfs/`
@@ -49,13 +49,13 @@ export default function CreateProduct() {
   async function generateTokenURI(fileUrl, data) {
     const { title, description, price } = data;
 
-    if (!title || !description || !price || !fileUrl) return; 
-    const requestData = JSON.stringify({ 
+    if (!title || !description || !price || !fileUrl) return;
+    const requestData = JSON.stringify({
       title, description, image: fileUrl
     });
 
     try {
-      const added = await client.add(requestData); 
+      const added = await client.add(requestData);
       const url = `https://ipfs.infura.io/ipfs/${added.path}`;
       createProduct(url, data);
     } catch (error) {
@@ -68,17 +68,23 @@ export default function CreateProduct() {
     const web3Modal = new Web3Modal();
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
+    const provider2 = new ethers.providers.JsonRpcBatchProvider(API_URL);
     const signer = provider.getSigner();
+    const signer2 = provider2.getSigner();
     const { title, description, brand, category, warranty, serials } = data;
-
-    serials.forEach((item, idx) => {
-      serials[idx] = parseInt(item);
-    })
 
     const price = ethers.utils.parseUnits(data.price, 'ether');
 
     const productsContract = new ethers.Contract(productsAddress, Products.abi, signer);
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer2);
+
+    serials.forEach((item, idx) => {
+      serials[idx] = parseInt(item);
+    });
+
+    for(let i = 0; i < serials.length; i++) {
+      await tokenContract.createToken(tokenURI, serials[i]);
+    }
 
     const tx = await productsContract.createProduct(
       title,
@@ -88,7 +94,6 @@ export default function CreateProduct() {
       price,
       warranty,
       serials,
-      tokenURI,
     );
 
     await tx.wait();
@@ -96,16 +101,16 @@ export default function CreateProduct() {
     const productsData = await productsContract.getProducts();
 
     const products = await Promise.all(productsData.map(async p => {
-      const tokenUri = await tokenContract.tokenURI(p.tokenIds[0]); 
+      const tokenUri = await tokenContract.tokenURI(p.tokenIds[0]);
       const meta = await axios.get(tokenUri);
-      let price = ethers.utils.formatUnits(p.price.toString(), 'ether');  
+      let price = ethers.utils.formatUnits(p.price.toString(), 'ether');
       const { title, description, brand, category, warrantyPeriod, tokenIds, seller, owner } = p;
 
       const tokens = await Promise.all(tokenIds.map(async t => {
         return t.toNumber();
       }))
 
-      let item = { 
+      let item = {
         title,
         description,
         brand,

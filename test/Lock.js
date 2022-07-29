@@ -20,17 +20,24 @@ describe('Products', () => {
 
     const [_, buyerAddress, thirdPerson] = await ethers.getSigners();
 
-    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 0, [123, 234], "https://www.mytokenlocation2.com", { value: "4" });
+    const serialNos = [123, 234];
+    const tokenURI = "https://www.mytokenlocation2.com";
 
-    console.log("Current Token owner: " + await products.getTokenOwner(234));
+    serialNos.forEach(token => {
+      nft.createToken(tokenURI, token);
+    });
 
-    console.log(await products.getProducts());
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 0, serialNos, { value: "4" });
+
+   // console.log("Current Token owner: " + await products.getTokenOwner(234));
+
+    console.log("After product creation ", await products.getProducts());
    
     await products.connect(buyerAddress).buyProduct(1, { value: auctionPrice });
 
     console.log("Current Token owner: " + await products.getTokenOwner(234));
 
-    console.log(await products.getProducts());
+    console.log("After buying product", await products.getProducts());
     console.log(await products.connect(buyerAddress).getMyProducts());
 
    // await nft.connect(buyerAddress).giveOwnershipToContract()

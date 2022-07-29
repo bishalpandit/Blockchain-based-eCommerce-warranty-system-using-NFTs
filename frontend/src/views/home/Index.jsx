@@ -8,9 +8,11 @@ import { API_URL, nftAddress, productsAddress } from "../../config";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
 import Navbar from './Navbar';
+import Hero from './Hero';
 import Footer from './Footer';
 import CaptionCarousel from './Carousel';
-import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem } from '@chakra-ui/react';
+import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem, Text } from '@chakra-ui/react';
+
 import { Link } from 'react-router-dom';
 import { IoMdFingerPrint } from 'react-icons/io';
 import Loader from '../../components/layout/Loader';
@@ -59,6 +61,30 @@ export default function Index() {
   return (
     <>
       <Navbar />
+      <Hero />
+      {/* <Text
+              as={"span"}
+              position={"relative"}
+              _after={{
+                content: "''",
+                width: "full",
+                height: useBreakpointValue({ base: "20%", md: "30%" }),
+                position: "absolute",
+                bottom: 1,
+                left: 0,
+                bg: "blue.400",
+                zIndex: -1
+              }}
+            >
+              Spotlight.
+            </Text>
+            <br />{" "}
+            <Text color={"blue.400"} as={"span"}>
+            Products you'll love{" "}
+            </Text>{" "} */}
+            <Text color={"blue.400"} as={"span"}>
+            Products you'll love{" "}
+            </Text>
       <Container maxW={'10xl'} centerContent my={10}>
         <Box>
           <SimpleGrid columns={[1, 1, 2, 3]} spacing='40px'>

@@ -31,6 +31,24 @@ const NavLink = ({ children }) => (
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
+  async function getAccount() {
+    // const accounts = await windows.ethereum.request({ method: 'eth_requestAccounts' });
+    // const account = accounts[0];
+    // showAccount.innerHTML = account;
+    if (typeof window.ethereum !== 'undefined') {
+      console.log(window.ethereum.request({ method: 'eth_requestAccounts' }));
+    } else {
+      alert("Install metamask")
+    }
+  }
+
+  window.ethereum.on('chainChanged', (chainId) => {
+    // Handle the new chain.
+    // Correctly handling chain changes can be complicated.
+    // We recommend reloading the page unless you have good reason not to.
+    window.location.reload();
+  });
+
   return (
     <>
       <Box bg={useColorModeValue('gray.100', 'gray.900')} px={4}>
@@ -61,7 +79,9 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={<AddIcon />}>
+              leftIcon={<AddIcon />}
+              onClick={getAccount}
+              >
               Connect to wallet
             </Button>
             <Menu>

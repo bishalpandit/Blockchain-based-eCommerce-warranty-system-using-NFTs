@@ -212,8 +212,8 @@ function Card({ itemId, image, title, price, description, tokenIds, owner }) {
           <Box fontSize="2xl" color={useColorModeValue("gray.800", "white")}>
             <Box as="span" py={2} color={"gray.600"} fontSize="lg">
               {parseInt(owner) == 0
-                ? price + "ETH"
-                : price + "ETH | months left"}
+                ? price + " ETH"
+                : price + " ETH | months left"}
             </Box>
           </Box>
         </Flex>

@@ -9,6 +9,7 @@ import Web3Modal from "web3modal";
 
 
 import Index from "./Index";
+import ProductHistory from "./ProductHistory";
 
 function HomeRoutes() {
   return (
@@ -16,9 +17,13 @@ function HomeRoutes() {
       <Route path="/product/*">
         <Route path=":id" element={<ProductDetails />} />
       </Route>
+      <Route path="/verify/*">
+      <Route path="/:id" element={<ProductHistory />} />
+      </Route>
       <Route path="/" element={<Index />} />
     </Routes>
   );
 }
+
 
 export default HomeRoutes;

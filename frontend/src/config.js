@@ -3,3 +3,4 @@
 export const nftAddress = "0x91794aD633b1A18013d8CCaFA12BD2f98e7C731B"
 export const productsAddress = "0xaE16f167ecf93b2c729952D2c03c8141137aB945"
 export const API_URL = 'https://eth-goerli.g.alchemy.com/v2/u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX'
+export const API_KEY = 'u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX'

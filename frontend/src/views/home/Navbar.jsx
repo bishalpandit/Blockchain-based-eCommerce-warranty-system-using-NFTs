@@ -25,7 +25,9 @@ import { useEffect } from 'react';
 import web3Modal from 'web3modal'
 import { ethers } from "ethers";
 
-const Links = [{ to: '/dashboard', value: 'Dashboard' }];
+const Links = [{ to: '/dashboard', value: 'Dashboard' },
+                {to: '/verify/', value: 'Verify'},
+            ];
 
 const NavLink = ({ children }) => (
   <Link

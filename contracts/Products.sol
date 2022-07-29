@@ -52,8 +52,7 @@ contract Products is ReentrancyGuard {
         string memory category,
         uint256 price,
         uint8 warrantyPeriod,
-        uint256[] memory serialNos,
-        string memory tokenURI
+        uint256[] memory serialNos
     ) public payable nonReentrant {
         require(price > 0, "Price must be at least 1 wei");
 
@@ -69,11 +68,19 @@ contract Products is ReentrancyGuard {
             price,
             warrantyPeriod,
             0,
-            generateTokens(tokenURI, serialNos),
+            serialNos,
             payable(msg.sender),
             payable(address(0)),
             false
         );
+
+        for (uint8 i = 0; i < serialNos.length; i++) {
+            IERC721(nftContract).transferFrom(
+                msg.sender,
+                address(this),
+                serialNos[i]
+            );
+        }
     }
 
     function buyProduct(uint256 itemId) public payable nonReentrant {
@@ -127,19 +134,6 @@ contract Products is ReentrancyGuard {
         emit Transfer(product.seller, msg.sender, lastTokenId);
     }
 
-    function generateTokens(string memory tokenURI, uint256[] memory serialNos)
-        private
-        returns (uint256[] memory)
-    {
-        uint256[] memory tokens = new uint256[](serialNos.length);
-
-        for (uint8 i = 0; i < serialNos.length; i++) {
-            tokens[i] = NFT(nftContract).createToken(tokenURI, serialNos[i]);
-        }
-
-        return tokens;
-    }
-
     function getProducts() public view returns (Product[] memory) {
         uint256 itemsCount = _itemIds.current();
         uint256 unsoldItemsCount = 0;
@@ -168,8 +162,23 @@ contract Products is ReentrancyGuard {
         returns (Product memory)
     {
         uint256 itemsCount = _itemIds.current();
-        require(itemsCount >= itemId, "Invalid itemd id");
+        require(itemsCount >= itemId, "Invalid item id");
         return idToProduct[itemId];
+    }
+
+     function getProductByTokenId(uint256 tokenId) public view returns (Product memory) {
+        uint256 itemsCount = _itemIds.current();
+        Product memory product;
+        for(uint256 i=1; i<=itemsCount; i++) {
+            if(idToProduct[i].tokenIds.length > 0) {
+                for(uint256 j=0; j<idToProduct[i].tokenIds.length; j++) {
+                    if(idToProduct[i].tokenIds[j] == tokenId) {
+                        product = idToProduct[i];
+                    }
+                }
+            }
+        }
+        return product;
     }
 
     function getMyProducts() public view returns (Product[] memory) {
@@ -206,7 +215,7 @@ contract Products is ReentrancyGuard {
                 currentTime > idToProduct[i + 1].warrantyEndDate
             ) {
                 uint256 token = idToProduct[i + 1].tokenIds[0];
-                this.burnToken(token);
+                burnToken(token);
                 idToProduct[i + 1].warrantyExpired = true;
             }
         }

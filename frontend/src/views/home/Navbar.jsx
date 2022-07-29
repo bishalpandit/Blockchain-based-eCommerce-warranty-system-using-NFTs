@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import {
   Box,
   Flex,
@@ -18,6 +18,8 @@ import {
 import { Link } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import logo from '../../images/logo.png';
+import { useMetaMask } from "metamask-react";
+import { useEffect } from 'react';
 
 const Links = [{ to: '/dashboard', value: 'Dashboard' },
                 {to: '/verify/', value: 'Verify'},
@@ -32,6 +34,7 @@ const NavLink = ({ children }) => (
 
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { status, connect, account, chainId, ethereum } = useMetaMask();
 
   return (
     <>
@@ -59,12 +62,13 @@ export default function Navbar() {
           </HStack>
           <Flex alignItems={'center'}>
             <Button
+              onClick={connect}
               variant={'solid'}
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
               leftIcon={<AddIcon />}>
-              Connect to wallet
+              {'Connect to wallet'}
             </Button>
             <Menu>
               <MenuButton

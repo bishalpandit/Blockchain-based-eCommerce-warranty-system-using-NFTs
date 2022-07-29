@@ -9,7 +9,6 @@ import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
 import Navbar from './Navbar';
 import Footer from './Footer';
-import CaptionCarousel from './Carousel';
 import { Box, Center, Container, Flex, Grid, SimpleGrid, Wrap, WrapItem } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { IoMdFingerPrint } from 'react-icons/io';

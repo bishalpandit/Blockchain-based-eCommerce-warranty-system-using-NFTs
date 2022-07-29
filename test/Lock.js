@@ -37,9 +37,10 @@ describe('Products', () => {
     await products.connect(buyerAddress).transferProduct(2, "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC");
 
     console.log("Current Token owner: " + await products.getTokenOwner(234));
+    console.log("get Product by TokenId: " , await products.getProductByTokenId(234));
     console.log(await products.connect(thirdPerson).getMyProducts());
     console.log(await products.connect(buyerAddress).getMyProducts());
-    await products.connect(thirdPerson).burnToken(234);
+    // await products.connect(thirdPerson).burnToken(234);
     //console.log("Current Token owner: " + await products.getTokenOwner(234));
   });
  });

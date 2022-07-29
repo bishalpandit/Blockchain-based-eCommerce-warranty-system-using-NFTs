@@ -160,8 +160,23 @@ contract Products is ReentrancyGuard {
 
     function getProductById(uint256 itemId) public view returns (Product memory) {
         uint256 itemsCount = _itemIds.current();
-        require(itemsCount >= itemId, "Invalid itemd id");
+        require(itemsCount >= itemId, "Invalid item id");
         return idToProduct[itemId];
+    }
+
+     function getProductByTokenId(uint256 tokenId) public view returns (Product memory) {
+        uint256 itemsCount = _itemIds.current();
+        Product memory product;
+        for(uint256 i=1; i<=itemsCount; i++) {
+            if(idToProduct[i].tokenIds.length > 0) {
+                for(uint256 j=0; j<idToProduct[i].tokenIds.length; j++) {
+                    if(idToProduct[i].tokenIds[j] == tokenId) {
+                        product = idToProduct[i];
+                    }
+                }
+            }
+        }
+        return product;
     }
 
     function getMyProducts() public view returns (Product[] memory) {

@@ -12,7 +12,7 @@ module.exports = {
    defaultNetwork: "goerli",
    networks: {
       hardhat: {
-         chainId: 5
+         chainId: 1337
       },
       goerli: {
          url: API_URL,

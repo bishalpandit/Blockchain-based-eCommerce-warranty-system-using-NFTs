@@ -19,7 +19,9 @@ import { Link } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
 import logo from '../../images/logo.png';
 
-const Links = [{ to: '/dashboard', value: 'Dashboard' }];
+const Links = [{ to: '/dashboard', value: 'Dashboard' },
+                {to: '/verify/', value: 'Verify'},
+            ];
 
 const NavLink = ({ children }) => (
   <Link

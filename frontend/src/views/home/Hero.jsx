@@ -39,8 +39,7 @@ export default function Hero() {
             </Text>{" "}
           </Heading>
           <Text fontSize={{ base: "md", lg: "lg" }} color={"gray.500"}>
-            The project board is an exclusive resource for contract work. It's
-            perfect for freelancers, agencies, and moonlighters.
+            Buy. Get a digital NFT. Verify Ownership.
           </Text>
           <Stack direction={{ base: "column", md: "row" }} spacing={4}>
             <Button
@@ -51,9 +50,9 @@ export default function Hero() {
                 bg: "blue.500"
               }}
             >
-              Create Project
+              Verify Ownership
             </Button>
-            <Button rounded={"full"}>How It Works</Button>
+            {/* <Button rounded={"full"}></Button> */}
           </Stack>
         </Stack>
       </Flex>

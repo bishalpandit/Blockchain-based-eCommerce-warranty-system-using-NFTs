@@ -18,7 +18,7 @@ function HomeRoutes() {
         <Route path=":id" element={<ProductDetails />} />
       </Route>
       <Route path="/verify/*">
-      <Route path="/:id" element={<ProductHistory />} />
+      <Route path=":id" element={<ProductHistory />} />
       </Route>
       <Route path="/" element={<Index />} />
     </Routes>

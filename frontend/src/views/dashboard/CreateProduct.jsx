@@ -68,15 +68,14 @@ export default function CreateProduct() {
     const web3Modal = new Web3Modal();
     const connection = await web3Modal.connect();
     const provider = new ethers.providers.Web3Provider(connection);
-    const provider2 = new ethers.providers.JsonRpcBatchProvider(API_URL);
     const signer = provider.getSigner();
-    const signer2 = provider2.getSigner();
     const { title, description, brand, category, warranty, serials } = data;
+
 
     const price = ethers.utils.parseUnits(data.price, 'ether');
 
     const productsContract = new ethers.Contract(productsAddress, Products.abi, signer);
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer2);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer);
 
     serials.forEach((item, idx) => {
       serials[idx] = parseInt(item);

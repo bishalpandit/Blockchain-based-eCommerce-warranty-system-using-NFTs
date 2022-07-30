@@ -62,10 +62,10 @@ export default function Index() {
         <Text
           color={"blue.400"} as={"span"}
         >
-          Spotlight.{" "}
+          Spotlight{" "}
         </Text>
         <Text as={"span"}>
-          Products you'll love{" "}
+          products you will love.{" "}
         </Text>{" "}
       </Heading>
       </Container>

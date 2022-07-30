@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, useCallback, useState } from 'react';
 import {
   Box,
   Flex,
@@ -26,8 +26,8 @@ import web3Modal from 'web3modal'
 import { ethers } from "ethers";
 
 const Links = [{ to: '/dashboard', value: 'Dashboard' },
-                {to: '/verify/', value: 'Verify'},
-            ];
+{ to: '/verify/', value: 'Verify' },
+];
 
 const NavLink = ({ children }) => (
   <Link
@@ -70,7 +70,7 @@ export default function Navbar() {
         duration: 5000,
         isClosable: true,
         position: "top",
-    });
+      });
     } else {
       toast({
         title: "Metamask Not Found",
@@ -79,7 +79,7 @@ export default function Navbar() {
         duration: 5000,
         isClosable: true,
         position: "top",
-    });
+      });
     }
   }
 
@@ -87,17 +87,29 @@ export default function Navbar() {
     window.location.reload();
   });
 
-  window.ethereum.on('accountsChanged', (accounts) => {
-    setAccount(accounts[0])
-    toast({
-      title: "Account Changed",
-      description: `Address :${account}`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: "top",
-    });
-  });
+  const onAccountChange = useCallback(
+    (accounts) => {
+      setAccount(accounts[0]);
+        toast({
+          title: "Account Changed",
+          description: `Address :${accounts[0]}`,
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+          position: "top",
+        });
+    },
+    [setAccount, account],
+  );
+
+  useEffect(() => {
+    window.ethereum.on('accountsChanged', onAccountChange);
+    return () => {
+      window.ethereum.removeListener('accountsChanged', onAccountChange);
+    }
+  }, [window, onAccountChange])
+
+
 
   return (
     <>
@@ -129,9 +141,9 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={account === '' ? <AddIcon />: <CircleIcon boxSize={4} />}
+              leftIcon={account === '' ? <AddIcon /> : <CircleIcon boxSize={4} />}
               onClick={getAccount}
-              >
+            >
               {account === '' ? "Connect to wallet" : "Connected"}
             </Button>
             <Menu>

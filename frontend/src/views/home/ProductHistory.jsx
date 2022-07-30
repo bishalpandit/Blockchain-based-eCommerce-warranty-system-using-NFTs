@@ -86,8 +86,8 @@ function ProductHistory() {
 
 
         axios(API_URL, requestOptions)
-            .then(response => {
-                const response = response?.data?.result?.transfers || []
+            .then(res => {
+                const response = res?.data?.result?.transfers || []
                 const data = response.map((transaction) => transaction.to);
                 if(response.length)
                 data.push(transactions[ transactions.length -1 ].from)

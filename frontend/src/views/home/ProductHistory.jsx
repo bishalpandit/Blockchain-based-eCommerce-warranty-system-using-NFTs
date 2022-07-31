@@ -36,21 +36,14 @@ function ProductHistory() {
     const { id } = useParams();
     const toast = useToast();
     const navigate = useNavigate();
-    const transactions = [
-        1223333,
-        6454545,
-        "sdfsfsdsf",
-        
-    ]
-
-    const [tokenId, setTokenId] = useState('');
-    const [product, setProduct] = useState({
-        title: "apple Watch",
-        brand: "apple",
-        price: "51",
-        category: "watch",
-        warrantyPeriod: "6Month",
-        description: "coolest watch you ever need....",
+    const [searchTokenId, setSearchTokenId] = useState('');
+    const [productData, setProductData] = useState({
+        title: "",
+        brand: "",
+        price: "",
+        category: "",
+        warrantyPeriod: "",
+        description: "",
         transactionHistory: []
     });
 
@@ -58,6 +51,7 @@ function ProductHistory() {
         if (id) {
             loadNFTByTokenId(id);
             getTransactionHistory(id);
+            setSearchTokenId(id);
         }
     }, [id]);
 
@@ -90,8 +84,8 @@ function ProductHistory() {
                 const response = res?.data?.result?.transfers || []
                 const data = response.map((transaction) => transaction.to);
                 if(response.length)
-                data.push(transactions[ transactions.length -1 ].from)
-                setProduct({ ...product, transactionHistory: data })
+                data.push(response[ response.length -1 ].from)
+                setProductData((productData) => { return{ ...productData, transactionHistory: data }})
             }).catch(error => console.log(error));
     }
 
@@ -101,7 +95,7 @@ function ProductHistory() {
             const productContract = new ethers.Contract(productsAddress, Products.abi, provider);
             const tokenContract = new ethers.Contract(nftAddress, NFT.abi, provider);
 
-            const product = await productContract.getProductById(BigNumber.from(id));
+            const product = await productContract.getProductByTokenId(BigNumber.from(id));
             const tokenUri = await tokenContract.tokenURI(product.tokenIds[0]);
             const meta = (await axios.get(tokenUri)).data;
             let price = ethers.utils.formatUnits(product.price.toString(), 'ether');
@@ -110,26 +104,31 @@ function ProductHistory() {
                 return t.toNumber();
             }));
 
-            setProduct({
-                ...product,
+            setProductData((productData) =>  { return{
+                ...productData,
+                brand: product.brand,
+                title: product.title,
+                category: product.category,
+                warrantyPeriod: product.warrantyPeriod,
                 tokens,
                 price,
                 image: meta.image
-            });
+            }});
         } catch (error) {
             toast({
-
-            })
+                description: `Something went Wrong.`,
+                status: "warning",
+                duration: 5000,
+                isClosable: true,
+                position: "top",
+              });
         }
 
     }
 
     const getDetails = () => {
-        navigate(`/verify/${tokenId}`)
+        navigate(`/verify/${searchTokenId}`)
     }
-
-    if (!product)
-        return <Loader />
 
     return (
         <>
@@ -138,7 +137,8 @@ function ProductHistory() {
       <Input
         pr='4.5rem'
         type='text'
-        onChange={(e) => setTokenId(e.target.value)}
+        onChange={(e) => setSearchTokenId(e.target.value)}
+        value={searchTokenId}
         placeholder='Enter your token'
       />
       <InputRightElement width='4.5rem'>
@@ -147,6 +147,8 @@ function ProductHistory() {
         </Button>
       </InputRightElement>
     </InputGroup>
+   {!productData.title ? 
+         <Loader />: 
             <Container maxW={'7xl'}>
                 <SimpleGrid
                     columns={{ base: 1, lg: 2 }}
@@ -156,7 +158,7 @@ function ProductHistory() {
                         <Image
                             rounded={'md'}
                             alt={'product image'}
-                            src={product.image}
+                            src={productData.image}
                             fit={'cover'}
                             align={'center'}
                             w={'100%'}
@@ -169,16 +171,16 @@ function ProductHistory() {
                                 lineHeight={1.1}
                                 fontWeight={600}
                                 fontSize={{ base: '2xl', sm: '4xl', lg: '5xl' }}>
-                                {product.title}
+                                {productData.title}
                             </Heading>
                             <Heading as='h5' size='sm' color="gray.500" ps="3">
-                                By {product.brand}
+                                By {productData.brand}
                             </Heading>
                             <Text
                                 color={useColorModeValue('gray.900', 'gray.400')}
                                 fontWeight={300}
                                 fontSize={'2xl'}>
-                                Rs {product.price}
+                                Rs {productData.price}
                             </Text>
                         </Box>
 
@@ -192,7 +194,7 @@ function ProductHistory() {
                             }>
 
                             <Text fontSize={'lg'}>
-                                {product.description}
+                                {productData.description}
                             </Text>
                             <Box>
                                 <Heading
@@ -209,13 +211,13 @@ function ProductHistory() {
                                         <Text as={'span'} fontWeight={'bold'}>
                                             Warranty:
                                         </Text>{' '}
-                                        {product.warrantyPeriod} Months
+                                        {productData.warrantyPeriod} Months
                                     </ListItem>
                                     <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>
                                             Category:
                                         </Text>{' '}
-                                        {product.category}
+                                        {productData.category}
                                     </ListItem>
                                     {/* <ListItem>
                                         <Text as={'span'} fontWeight={'bold'}>
@@ -227,7 +229,7 @@ function ProductHistory() {
                             </Box>
                             <Box>
                                 <Heading
-                                    as='h5' size='sm'
+                                    as='h5' size='sm'return
                                     fontSize={{ base: '16px', lg: '18px' }}
                                     color={'gray.500'}
                                     textTransform={'uppercase'}
@@ -236,7 +238,7 @@ function ProductHistory() {
                                 </Heading>
                                     <Box _before={{content: '""', position: 'absolute', width: '8px', height: '100%', backgroundColor: 'var(--chakra-colors-green-100)'}} position='relative'  paddingLeft='50px'  >
                                           {
-                                        data.map((id) => (
+                                        productData.transactionHistory.map((id) => (
                                             <List spacing={2} display='flex' alignItems='center' marginBottom='10px' marginTop='10px'>
                                             <RiArrowUpCircleFill style={{position:'relative', left:'4px', transform: 'translateX(-50%)', width:'25px', height: '25px',  color: 'var(--chakra-colors-teal-500)'}}/>
                                             <Badge as={'p'} fontWeight={'bold'} marginTop='0px !important' marginLeft='5px' padding='2px' colorScheme='green'>
@@ -279,7 +281,7 @@ function ProductHistory() {
                         </Stack>
                     </Stack>
                 </SimpleGrid>
-            </Container>
+            </Container>}
         </>
 
     );

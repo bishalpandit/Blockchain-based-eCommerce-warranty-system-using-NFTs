@@ -2,7 +2,8 @@
   "name": "hardhat-project",
   "scripts": {
     "client": "cd frontend && npm run dev",
-    "install": "npm i && cd frontend && npm i"
+    "install-client": "cd frontend && npm install --force",
+    "install-modules": "npm install && npm run install-client"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.4",

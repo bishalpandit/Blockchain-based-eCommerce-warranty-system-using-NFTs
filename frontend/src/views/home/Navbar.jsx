@@ -90,6 +90,7 @@ export default function Navbar() {
   const onAccountChange = useCallback(
     (accounts) => {
       setAccount(accounts[0]);
+      if (accounts[0] !== '0x00000000000') {
         toast({
           title: "Account Changed",
           description: `Address :${accounts[0]}`,
@@ -98,6 +99,7 @@ export default function Navbar() {
           isClosable: true,
           position: "top",
         });
+      }
     },
     [setAccount, account],
   );
@@ -141,10 +143,10 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={account === '' ? <AddIcon /> : <CircleIcon boxSize={4} />}
+              leftIcon={account === '0x00000000000' ? <AddIcon /> : <CircleIcon boxSize={4} />}
               onClick={getAccount}
             >
-              {account === '' ? "Connect to wallet" : "Connected"}
+              {account === '0x00000000000' ? "Connect to wallet" : "Connected"}
             </Button>
             <Menu>
               <MenuButton

@@ -29,7 +29,7 @@ To run this app locally on your PC, follow the instructions given below:
 ### Installation
 
 1. Clone using ``` git clone repo name ```.
-2. Use ```npm run install``` in root folder to install all modules.
+2. Use ```npm run install-modules``` in root folder to install all modules.
 
 ### Running application on localhost
 1. Use ```npx hardhat node``` to run a local node. Import auto-generated accounts in Metamask.

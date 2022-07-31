@@ -138,7 +138,7 @@ export default function ProductDetails() {
                                 color={useColorModeValue('gray.900', 'gray.400')}
                                 fontWeight={300}
                                 fontSize={'2xl'}>
-                                Rs {product.price}
+                                ETH {product.price}
                             </Text>
                         </Box>
 

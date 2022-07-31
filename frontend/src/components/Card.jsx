@@ -180,7 +180,7 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
     <Box
       bg={useColorModeValue("white", "gray.800")}
       w="300px"
-      h="450px"
+      h={isOwned ? "470px" : "450px"}
       borderWidth="1px"
       rounded="lg"
       shadow="lg"
@@ -221,7 +221,7 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
             <chakra.a href={"#"} display={"flex"}>
               <Button onClick={onOpen}>
                 <Icon
-                  as={isOwned ? FiSend : FiShoppingCart }
+                  as={isOwned ? FiSend : FiShoppingCart}
                   h={5}
                   w={5}
                   alignSelf={"center"}
@@ -269,10 +269,14 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
             </Box>
             {
               isOwned &&
-              <Box py={2} color={"gray.300"} fontSize="lg">
-              {`Warranty Left: ${warrantyLeftInMonths} months`}
-               <Icon ml={2} as={warrantyExpired ? ImCross : MdVerifiedUser} h={5} w={5} color="white" />
-            </Box>
+              <Box>
+                <Badge rounded="xl" p={2} colorScheme={ warrantyExpired ? "red" : "green"} fontSize="sm">
+                  { warrantyExpired ? 'Warranty Expired' : `Warranty Left: ${warrantyLeftInMonths} months`}
+                </Badge>
+                <Box mt={2}>
+                  <Text fontSize={"sm"}>Serial No. {tokenIds[0]}</Text>
+                </Box>
+              </Box>
             }
           </Box>
         </Flex>

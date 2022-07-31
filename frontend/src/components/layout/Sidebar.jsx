@@ -17,6 +17,8 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  useColorMode,
+  Button,
 } from '@chakra-ui/react';
 import {
   FiHome,
@@ -31,15 +33,16 @@ import {
 import {
   Link
 } from 'react-router-dom';
+import { BiUserCircle } from 'react-icons/bi';
 
 const LinkItems = [
-  { name: 'Products Bought', icon: FiHome, path: '/dashboard/' },
+  { name: 'Purchase History', icon: FiHome, path: '/dashboard/' },
   { name: 'Create Product', icon: FiTrendingUp, path: '/dashboard/create-product' },
-  { name: 'Product for Sale', icon: FiCompass, path: '/for-sale' },
 ];
 
 export default function SidebarWithHeader({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.100', 'gray.900')}>
       <SidebarContent
@@ -68,6 +71,7 @@ export default function SidebarWithHeader({ children }) {
 }
 
 const SidebarContent = ({ onClose, ...rest }) => {
+
   return (
     <Box
       transition="3s ease"
@@ -128,6 +132,7 @@ const NavItem = ({ icon, children, path, ...rest }) => {
 
 
 const MobileNav = ({ onOpen, ...rest }) => {
+  const { colorMode, toggleColorMode } = useColorMode();
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -163,28 +168,22 @@ const MobileNav = ({ onOpen, ...rest }) => {
           icon={<FiBell />}
         />
         <Flex alignItems={'center'}>
+          <Button mr={4} onClick={toggleColorMode}>
+            {colorMode === 'light' ? 'Dark' : 'Light'}
+          </Button>
           <Menu>
             <MenuButton
               py={2}
               transition="all 0.3s"
               _focus={{ boxShadow: 'none' }}>
               <HStack>
+
                 <Avatar
                   size={'sm'}
                   src={
-                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
+                    <BiUserCircle />
                   }
                 />
-                <VStack
-                  display={{ base: 'none', md: 'flex' }}
-                  alignItems="flex-start"
-                  spacing="1px"
-                  ml="2">
-                  <Text fontSize="sm">Justina Clark</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    Admin
-                  </Text>
-                </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
                 </Box>
@@ -193,11 +192,15 @@ const MobileNav = ({ onOpen, ...rest }) => {
             <MenuList
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}>
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
-              <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <Link to="/">
+                <MenuItem>Home</MenuItem>
+              </Link>
+              <Link to="/dashboard/create-product">
+                <MenuItem>Create Product</MenuItem>
+              </Link>
+              <Link to="/dashboard">
+                <MenuItem>Purchase History</MenuItem>
+              </Link>
             </MenuList>
           </Menu>
         </Flex>

@@ -17,6 +17,7 @@ import {
   Badge,
   useToast,
   Icon,
+  useColorMode,
 } from '@chakra-ui/react';
 import { Link } from 'react-router-dom';
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons';
@@ -24,9 +25,10 @@ import logo from '../../images/logo.png';
 import { useEffect } from 'react';
 import web3Modal from 'web3modal'
 import { ethers } from "ethers";
+import { BiUserCircle } from 'react-icons/bi';
 
 const Links = [{ to: '/dashboard', value: 'Dashboard' },
-{ to: '/verify/', value: 'Verify' },
+{ to: '/verify/', value: 'Verify Ownership' },
 ];
 
 const NavLink = ({ children }) => (
@@ -47,13 +49,11 @@ const CircleIcon = (props) => (
 
 export default function Navbar() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [account, setAccount] = useState('0x00000000000')
+  const [account, setAccount] = useState('')
   const toast = useToast();
+  const { colorMode, toggleColorMode } = useColorMode();
 
   async function getAccount() {
-    // const accounts = await windows.ethereum.request({ method: 'eth_requestAccounts' });
-    // const account = accounts[0];
-    // showAccount.innerHTML = account;
     if (typeof window.ethereum !== 'undefined') {
       // const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
       // console.log(acc)
@@ -62,10 +62,9 @@ export default function Navbar() {
       const signer = provider.getSigner()
       console.log(acc[0])
       setAccount(acc[0])
-      console.log(account)
       toast({
         title: "Metamask Connected",
-        description: `Address : ${account}`,
+        description: `Address : ${acc[0]}`,
         status: "success",
         duration: 5000,
         isClosable: true,
@@ -90,7 +89,7 @@ export default function Navbar() {
   const onAccountChange = useCallback(
     (accounts) => {
       setAccount(accounts[0]);
-      if (accounts[0] !== '0x00000000000') {
+      if (accounts[0] !== '') {
         toast({
           title: "Account Changed",
           description: `Address :${accounts[0]}`,
@@ -143,10 +142,13 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={account === '0x00000000000' ? <AddIcon /> : <CircleIcon boxSize={4} />}
+              leftIcon={account === '' ? <AddIcon /> : <CircleIcon boxSize={4} />}
               onClick={getAccount}
             >
-              {account === '0x00000000000' ? "Connect to wallet" : "Connected"}
+              {account === '' ? "Connect to wallet" : "Connected"}
+            </Button>
+            <Button mr={4} onClick={toggleColorMode}>
+              {colorMode === 'light' ? 'Dark' : 'Light'}
             </Button>
             <Menu>
               <MenuButton
@@ -158,16 +160,24 @@ export default function Navbar() {
                 <Avatar
                   size={'sm'}
                   src={
-                    'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
+                    <BiUserCircle />
                   }
                 />
               </MenuButton>
               <MenuList>
-                <Badge colorScheme='twitter' variant='outline'>Address: {account}</Badge>
-                <br />{" "}
-                <MenuItem>Your Product for Sale</MenuItem>
-                <MenuItem>Transfer Ownership</MenuItem>
-                <MenuItem>Create your Product</MenuItem>
+                {
+                  account &&
+                  <MenuItem><Badge colorScheme='twitter' variant='outline'>Address: {account}</Badge></MenuItem>
+                }
+                <Link to="/dashboard/create-product">
+                  <MenuItem>Create Product</MenuItem>
+                </Link>
+                <Link to="/dashboard">
+                  <MenuItem>Purchase History</MenuItem>
+                </Link>
+                <Link to="/verify"> 
+                  <MenuItem>Verify Ownership</MenuItem>
+                </Link>
               </MenuList>
             </Menu>
           </Flex>

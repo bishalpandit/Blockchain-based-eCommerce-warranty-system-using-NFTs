@@ -8,6 +8,7 @@ import {
   useBreakpointValue,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 
 import heroImg from "../../images/hero.png";
 
@@ -42,17 +43,18 @@ export default function Hero() {
             Buy. Get a digital NFT. Verify Ownership.
           </Text>
           <Stack direction={{ base: "column", md: "row" }} spacing={4}>
-            <Button
-              rounded={"full"}
-              bg={"blue.400"}
-              color={"white"}
-              _hover={{
-                bg: "blue.500"
-              }}
-            >
-              Verify Ownership
-            </Button>
-            {/* <Button rounded={"full"}></Button> */}
+            <Link to="/verify">
+              <Button
+                rounded={"full"}
+                bg={"blue.400"}
+                color={"white"}
+                _hover={{
+                  bg: "blue.500"
+                }}
+              >
+                Verify Ownership
+              </Button>
+            </Link>
           </Stack>
         </Stack>
       </Flex>

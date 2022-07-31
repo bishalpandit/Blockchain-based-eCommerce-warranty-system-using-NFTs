@@ -1,7 +1,9 @@
 import {
   Box,
+  Flex,
   Grid,
-  GridItem
+  GridItem,
+  Heading
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
@@ -27,13 +29,13 @@ function Main() {
     const provider = new ethers.providers.Web3Provider(connection);
     const signer = provider.getSigner()
 
-    const productsContract = new ethers.Contract(productsAddress, Products.abi, signer); 
-    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer); 
+    const productsContract = new ethers.Contract(productsAddress, Products.abi, signer);
+    const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer);
 
     // get tokenURI by intracting with tokenContract 
     const data = await productsContract.getMyProducts();
-  
-    const items = await Promise.all(data.map(async i => { 
+
+    const items = await Promise.all(data.map(async i => {
 
       const tokenUri = await tokenContract.tokenURI(i.tokenIds[0])
       const meta = await axios.get(tokenUri)
@@ -61,17 +63,21 @@ function Main() {
   }
 
   return (
-    <Box>
-      <Grid padding={4} templateColumns='repeat(5, 1fr)' gap={6}>
-        {
+    <Flex justify="center" align="center" h="100%">
+      {
+        !nfts.length ?
+          <Heading mt={8}>
+            No items in your list
+          </Heading>
+          :
           nfts.map((nft, i) =>
             <GridItem key={i} w='100%' h='10'>
               <Card {...nft} />
             </GridItem>
           )
-        }
-      </Grid>
-    </Box>
+      }
+
+    </Flex>
   )
 }
 

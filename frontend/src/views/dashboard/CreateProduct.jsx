@@ -13,12 +13,13 @@ import {
   IconButton,
   Image
 } from '@chakra-ui/react';
+import { useNavigate } from "react-router-dom";
 import { create as ipfsHttpClient } from 'ipfs-http-client';
 import { useState } from 'react';
 import { AddIcon, MinusIcon } from '@chakra-ui/icons';
 import { useFileUpload } from 'use-file-upload';
 import Web3Modal from 'web3modal';
-import { ethers } from 'ethers';
+import { ethers, BigNumber } from 'ethers';
 import { useForm } from "react-hook-form";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
@@ -30,6 +31,7 @@ const baseDataURL = `https://ipfs.infura.io/ipfs/`
 const client = ipfsHttpClient(`https://ipfs.infura.io:5001/api/v0`)
 
 export default function CreateProduct() {
+  const navigation = useNavigate();
   const [indexes, setIndexes] = useState([]);
   const [counter, setCounter] = useState(0);
   const { register, handleSubmit } = useForm();
@@ -78,7 +80,7 @@ export default function CreateProduct() {
     const tokenContract = new ethers.Contract(nftAddress, NFT.abi, signer);
 
     serials.forEach((item, idx) => {
-      serials[idx] = parseInt(item);
+      serials[idx] = BigNumber.from(item);
     });
 
     for(let i = 0; i < serials.length; i++) {
@@ -126,6 +128,8 @@ export default function CreateProduct() {
     }));
 
     console.log(products);
+    navigation("/")
+    
 
   }
 

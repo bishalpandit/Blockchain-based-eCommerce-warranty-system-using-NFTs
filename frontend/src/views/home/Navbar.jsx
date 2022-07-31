@@ -55,8 +55,6 @@ export default function Navbar() {
 
   async function getAccount() {
     if (typeof window.ethereum !== 'undefined') {
-      // const acc = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      // console.log(acc)
       const provider = new ethers.providers.Web3Provider(window.ethereum)
       const acc = await provider.send("eth_requestAccounts", []);
       const signer = provider.getSigner()
@@ -89,10 +87,10 @@ export default function Navbar() {
   const onAccountChange = useCallback(
     (accounts) => {
       setAccount(accounts[0]);
-      if (accounts[0] !== '') {
+      if (accounts[0] !== account) {
         toast({
-          title: "Account Changed",
-          description: `Address :${accounts[0]}`,
+          title:  `${!accounts[0]? "Disconnected": `Account Changed`}`,
+          description: `${!accounts[0]? '': `Address ${accounts[0]}`}`,
           status: "success",
           duration: 5000,
           isClosable: true,
@@ -104,12 +102,13 @@ export default function Navbar() {
   );
 
   useEffect(() => {
-    window.ethereum.on('accountsChanged', onAccountChange);
-    return () => {
-      window.ethereum.removeListener('accountsChanged', onAccountChange);
+    if (account) {
+      window.ethereum.on('accountsChanged', onAccountChange);
+      return () => {
+        window.ethereum.removeListener('accountsChanged', onAccountChange);
+      }
     }
   }, [window, onAccountChange])
-
 
 
   return (
@@ -142,10 +141,10 @@ export default function Navbar() {
               colorScheme={'teal'}
               size={'sm'}
               mr={4}
-              leftIcon={account === '' ? <AddIcon /> : <CircleIcon boxSize={4} />}
+              leftIcon={account  ?  <CircleIcon boxSize={4} />: <AddIcon /> }
               onClick={getAccount}
             >
-              {account === '' ? "Connect to wallet" : "Connected"}
+              {account?  "Connected": "Connect to wallet"}
             </Button>
             <Button mr={4} onClick={toggleColorMode}>
               {colorMode === 'light' ? 'Dark' : 'Light'}
@@ -175,7 +174,7 @@ export default function Navbar() {
                 <Link to="/dashboard">
                   <MenuItem>Purchase History</MenuItem>
                 </Link>
-                <Link to="/verify"> 
+                <Link to="/verify">
                   <MenuItem>Verify Ownership</MenuItem>
                 </Link>
               </MenuList>

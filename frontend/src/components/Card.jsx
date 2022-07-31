@@ -84,17 +84,19 @@ function Rating({ rating, numReviews }) {
   );
 }
 
-function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, warrantyExpired }) {
+function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, warrantyExpired , setRemoveProduct}) {
   const toast = useToast();
   const [receiverAddress, setReceiverAddress] = useState('');
   const warrantyLeftInMonths = Math.floor((warrantyEndDate - Date.now()) / (3600 * 24 * 30 * 1000));
+  const [loading, setLoading] = useState(false);
   const isOwned = parseInt(owner) !== 0;
-
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   // buying nft
-  async function buyNFT(itemId, price) {
-
+  async function buyNFT(e, itemId, price) {
+    e.preventDefault();
+    e.stopPropagation();
+    setLoading(true);
     try {
       const web3Modal = new Web3Modal();
       const connection = await web3Modal.connect();
@@ -117,7 +119,10 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
         isClosable: true,
         position: "top",
       });
+      setLoading(false);
+      setRemoveProduct(itemId);
     } catch (err) {
+      setLoading(false);
       toast({
         title: "Failure",
         description: err,
@@ -131,7 +136,7 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
   }
 
   async function transferProduct() {
-
+    setLoading(true);
     try {
       const web3Modal = new Web3Modal();
       const connection = await web3Modal.connect();
@@ -155,7 +160,10 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
         isClosable: true,
         position: "top",
       });
+      setLoading(false)
+      setRemoveProduct(itemId);
     } catch (err) {
+      setLoading(false)
       toast({
         title: "Failure",
         description: "Error occured. Check console for more info.",
@@ -186,8 +194,10 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
       shadow="lg"
       position="relative"
     >
-      <Box w="100%" h="270px" style={{ display: 'flex', alignItems: 'center' }}>
+      <Box w="100%" h="270px" style={{ display: 'flex', alignItems: 'center' , justifyContent: 'center'}}>
         <Image
+          height={"inherit"}
+          width={"inherit"}
           src={image}
           alt={`Picture of ${title}`}
           roundedTop="lg"
@@ -219,14 +229,17 @@ function Card({ itemId, image, title, price, warrantyEndDate, tokenIds, owner, w
             fontSize={"1.2em"}
           >
             <chakra.a href={"#"} display={"flex"}>
-              <Button onClick={onOpen}>
+              <Button onClick={onOpen}
+              isLoading={loading}
+              >
+                 
                 <Icon
                   as={isOwned ? FiSend : FiShoppingCart}
                   h={5}
                   w={5}
                   alignSelf={"center"}
                   onClick={
-                    !isOwned ? () => buyNFT(itemId, price) : null
+                    !isOwned ? (e) => buyNFT(e, itemId, price) : null
                   }
                 />
               </Button>

@@ -3,7 +3,8 @@ import {
   Flex,
   Grid,
   GridItem,
-  Heading
+  Heading,
+  SimpleGrid
 } from '@chakra-ui/react'
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
@@ -14,14 +15,38 @@ import { nftAddress, productsAddress } from "../../config";
 import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
 import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
 import Card from '../../components/Card';
+import Loader from '../../components/layout/Loader';
 
 function Main() {
   const [nfts, setNFTs] = useState([]);
-  const [loadingState, setLoadingState] = useState('not-loaded');
+  const [loadingState, setLoadingState] = useState(true);
+  const [removeProduct, setRemoveProduct] = useState(null);
 
   useEffect(() => {
     loadNFTs()
   }, []);
+
+  useEffect(() => {
+    if(removeProduct) {
+      let newNfts = nfts.map((nft) => {
+        if(nft.itemId === removeProduct) {
+          if(nft.tokenIds.length > 1) {
+            const newTokenIds = [...nft.tokenIds];
+            newTokenIds.pop();
+            return {
+              ...nfts, 
+              tokenIds: newTokenIds
+            }
+          } else return {...nft, tokenIds: []};
+        } else return nft;
+      })
+
+      console.log(newNfts, " new nfts before filter ")
+      newNfts =  newNfts.filter((nft) => nft.tokenIds.length);
+      console.log(newNfts, " new nfts ")
+      setNFTs(newNfts);
+    }
+  }, [removeProduct])
 
   async function loadNFTs() {
     const web3Modal = new Web3Modal();
@@ -59,25 +84,26 @@ function Main() {
 
     console.log("My nfts ", items)
     setNFTs(items)
-    setLoadingState('loaded');
+    setLoadingState(false);
   }
 
   return (
-    <Flex justify="center" align="center" h="100%">
+    <Box>
+    <SimpleGrid columns={[1, 1, 1, 2, 3]} spacing="40px">
       {
+        loadingState? <Loader />: 
         !nfts.length ?
           <Heading mt={8}>
             No items in your list
           </Heading>
           :
           nfts.map((nft, i) =>
-            <GridItem key={i} w='100%' h='10'>
-              <Card {...nft} />
-            </GridItem>
+              <Card {...nft} setRemoveProduct = {setRemoveProduct} />
           )
       }
 
-    </Flex>
+    </SimpleGrid>
+    </Box>
   )
 }
 

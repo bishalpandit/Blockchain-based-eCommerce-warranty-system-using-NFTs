@@ -30,6 +30,7 @@ import Loader from '../../components/layout/Loader';
 
 export default function ProductDetails() {
     const { id } = useParams();
+    const [loading, setLoading] = useState(false);
     const toast = useToast();
     const [product, setProduct] = useState(null);
 
@@ -68,6 +69,7 @@ export default function ProductDetails() {
 
     async function buyNFT() {
         try {
+            setLoading(true)
             const web3Modal = new Web3Modal();
             const connection = await web3Modal.connect();
             const provider = new ethers.providers.Web3Provider(connection);
@@ -89,15 +91,18 @@ export default function ProductDetails() {
                 isClosable: true,
                 position: "top",
             });
+            setLoading(false)
         } catch (err) {
+            setLoading(false)
             toast({
                 title: "Failure",
-                description: "Error occured. Check console for more info",
+                description: "Something went wrong!",
                 status: "error",
                 duration: 5000,
                 isClosable: true,
                 position: "top",
             });
+
         }
 
     }
@@ -193,6 +198,7 @@ export default function ProductDetails() {
                             </Box>
                         </Stack>
                         <Button
+                            isLoading={loading}
                             onClick={buyNFT}
                             w={['50%', '50%']}
                             mt={8}

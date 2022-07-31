@@ -17,10 +17,31 @@ import { Link } from 'react-router-dom';
 export default function Index() {
   const [nfts, setNFTs] = useState([]);
   const [loadingState, setLoadingState] = useState('not-loaded');
-
+  const [removeProduct, setRemoveProduct] = useState(null);
   useEffect(() => {
     loadNFTs()
   }, []);
+  useEffect(() => {
+    if(removeProduct) {
+      let newNfts = nfts.map((nft) => {
+        if(nft.itemId === removeProduct) {
+          if(nft.tokenIds.length > 1) {
+            const newTokenIds = [...nft.tokenIds];
+            newTokenIds.pop();
+            return {
+              ...nfts, 
+              tokenIds: newTokenIds
+            }
+          } else return {...nft, tokenIds: []};
+        } else return nft;
+      })
+
+      console.log(newNfts, " new nfts before filter ")
+      newNfts =  newNfts.filter((nft) => nft.tokenIds.length);
+      console.log(newNfts, " new nfts ")
+      setNFTs(newNfts);
+    }
+  }, [removeProduct])
 
   async function loadNFTs() {
     const provider = new ethers.providers.JsonRpcBatchProvider(API_URL);
@@ -77,7 +98,7 @@ export default function Index() {
                 <h1 className='px-20 py-10 text-3xl '> No items in marketplace</h1>
                 : nfts.map((nft, i) => (
                   <Link to={`/product/${nft.itemId}`}>
-                    <Card key={i} {...nft} />
+                    <Card key={i} {...nft} setRemoveProduct={setRemoveProduct} />
                   </Link>
                 ))
             }

@@ -89,9 +89,9 @@ function Main() {
 
   return (
     <Box>
-    <SimpleGrid columns={[1, 1, 1, 2, 3]} spacing="40px">
+     { loadingState ? <Loader /> :
+    <SimpleGrid columns={[1, 1, 1, 2, 3]} spacing="40px" >
       {
-        loadingState? <Loader />: 
         !nfts.length ?
           <Heading mt={8}>
             No items in your list
@@ -103,6 +103,7 @@ function Main() {
       }
 
     </SimpleGrid>
+}
     </Box>
   )
 }

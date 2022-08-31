@@ -17,6 +17,7 @@ describe('Products', () => {
     console.log("Product address", productsAddress);
     console.log("NFT address", nftContractAddress);
     const auctionPrice = ethers.utils.parseUnits('100', 'ether');
+    const warranty = ethers.utils.parseUnits('0.0000012');
 
     const [_, buyerAddress, thirdPerson] = await ethers.getSigners();
 
@@ -27,7 +28,7 @@ describe('Products', () => {
       nft.createToken(tokenURI, token);
     });
 
-    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, 0, serialNos, { value: "4" });
+    await products.createProduct('Iphone', 'Expensive item', 'Apple', 'Phone', auctionPrice, warranty, serialNos, { value: "4" });
 
    // console.log("Current Token owner: " + await products.getTokenOwner(234));
 

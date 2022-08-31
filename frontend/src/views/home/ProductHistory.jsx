@@ -160,15 +160,13 @@ function ProductHistory() {
                         spacing={{ base: 8, md: 10 }}
                         py={{ base: 4, md: 6 }}>
                         <Flex>
+                        <Box w="100%" h="270px" style={{ alignItems: 'center' }}>
                             <Image
                                 rounded={'md'}
                                 alt={'product image'}
                                 src={productData.image}
-                                fit={'cover'}
-                                align={'center'}
-                                w={'100%'}
-                                h={{ base: '100%', sm: '400px', lg: '500px' }}
                             />
+                            </Box>
                         </Flex>
                         <Stack spacing={{ base: 6, md: 10 }}>
                             <Box as={'header'}>

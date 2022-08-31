@@ -36,14 +36,18 @@ export default function CreateProduct() {
   const [counter, setCounter] = useState(0);
   const { register, handleSubmit } = useForm();
   const [file, selectFile] = useFileUpload();
+  const [loading, setLoading] = useState(false);
 
   const formSubmit = async (data) => {
     if (!file) return;
     try {
+      setLoading(true)
       const added = await client.add(file.file);
       const url = `${baseDataURL}${added.path}`;
       generateTokenURI(url, data);
+      setLoading(false);
     } catch (e) {
+      setLoading(false)
       console.log(e);
     }
   }
@@ -234,6 +238,7 @@ export default function CreateProduct() {
               </Stack>
               <Box>
                 <Button
+                  isLoading={loading}
                   onClick={formSubmit}
                   disabled={!file}
                   w={'xss'}

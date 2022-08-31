@@ -31,15 +31,28 @@ To run this app locally on your PC, follow the instructions given below:
 1. Clone using ``` git clone repo name ```.
 2. Use ```npm run install-modules``` in root folder to install all modules.
 
-### Running application on localhost
+### Running Application on Localhost
 1. Use ```npx hardhat node``` to run a local node. Import auto-generated accounts in Metamask.
 2. Run command ```npx hardhat run scripts/deploy.js --network localhost``` to deploy contracts and update address in config.js file inside frontend/src folder.
 3. Finally, run ```npm run client``` to spin up react app.
 
+### Metamask Configuration for using Remotely Deployed Contract
+1. Add a new network in your Metamask.
+2. Add RPC URL(If you're using Alchemy) - https://eth-goerli.g.alchemy.com/v2/u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX.
+3. Add Chain ID as 5 and Currency as ETH
+4. Add test Ether from goerlifaucet(https://goerlifaucet.com).
+
+### Environment Variables Used
+
+1. PRIVATE_KEY of your Metamask to deploy contract online.
+2. API_URL(Goerli RPC URL) -  https://eth-goerli.g.alchemy.com/v2/u8T-DCJZrAIHBwsyaZFDkggbSgKjIhqX
+
 
 #### Note: Evertime you run a local node, reset your Metamask account.
 
-## License
 
 ## Contributors
+1. Gourav Modi - [@gourav12345-modi](https://github.com/gourav12345-modi)
+2. Debopriya Dey - [@debopriyadey](https://github.com/debopriyadey)
+3. Bishal Pandit - [@bishalpandit](https://github.com/bishalpandit)
 

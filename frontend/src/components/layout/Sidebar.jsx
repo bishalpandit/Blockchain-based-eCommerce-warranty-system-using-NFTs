@@ -201,6 +201,9 @@ const MobileNav = ({ onOpen, ...rest }) => {
               <Link to="/dashboard">
                 <MenuItem>Purchase History</MenuItem>
               </Link>
+              <Link to="/verify">
+                <MenuItem>Verify Ownership</MenuItem>
+              </Link>
             </MenuList>
           </Menu>
         </Flex>

@@ -45,8 +45,8 @@ import { IoMdSend } from "react-icons/io";
 import { FiSend } from "react-icons/fi";
 import { ImCross } from "react-icons/im"
 
-import NFT from "../../../artifacts/contracts/NFT.sol/NFT.json";
-import Products from "../../../artifacts/contracts/Products.sol/Products.json";
+import NFT from "../contracts/NFT.sol/NFT.json";
+import Products from "../contracts/Products.sol/Products.json";
 
 const data = {
   isNew: true,

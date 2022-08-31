@@ -26,8 +26,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { RiArrowUpCircleFill } from 'react-icons/ri'
 
-import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
-import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
+import Products from '../../contracts/Products.sol/Products.json';
+import NFT from '../../contracts/NFT.sol/NFT.json';
 import { API_URL, nftAddress, productsAddress } from "../../config";
 import Navbar from './Navbar';
 import Loader from '../../components/layout/Loader';

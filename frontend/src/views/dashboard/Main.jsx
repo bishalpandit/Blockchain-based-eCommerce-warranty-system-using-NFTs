@@ -12,8 +12,8 @@ import axios from 'axios';
 import Web3Modal from 'web3modal'
 import { nftAddress, productsAddress } from "../../config";
 
-import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json'
-import Products from '../../../../artifacts/contracts/Products.sol/Products.json'
+import NFT from '../../contracts/NFT.sol/NFT.json'
+import Products from '../../contracts/Products.sol/Products.json'
 import Card from '../../components/Card';
 import Loader from '../../components/layout/Loader';
 

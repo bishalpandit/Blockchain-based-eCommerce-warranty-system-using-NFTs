@@ -21,8 +21,8 @@ import { useFileUpload } from 'use-file-upload';
 import Web3Modal from 'web3modal';
 import { ethers, BigNumber } from 'ethers';
 import { useForm } from "react-hook-form";
-import NFT from '../../../../artifacts/contracts/NFT.sol/NFT.json';
-import Products from '../../../../artifacts/contracts/Products.sol/Products.json';
+import NFT from '../../contracts/NFT.sol/NFT.json';
+import Products from '../../contracts/Products.sol/Products.json';
 import { API_URL, nftAddress, productsAddress } from "../../config";
 import axios from 'axios'
 
